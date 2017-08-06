@@ -1,4 +1,4 @@
-package job;
+package processing.light;
 
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.result.ResultMessage;

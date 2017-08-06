@@ -1,5 +1,6 @@
 package job;
 
+import cowbird.flink.common.messages.control.ComplexCompareControlMessage;
 import cowbird.flink.common.util.Utils;
 import cowbird.flink.common.config.Topics;
 
@@ -7,15 +8,13 @@ import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
-import job.swan.core.ConstantCompareFlatMap;
-import job.swan.core.SWANProcessFunction;
+import processing.core.ComplexCompareProcessFunction;
+import processing.core.ConstantCompareFlatMap;
+import processing.core.CoreProcessFunction;
 
 import org.apache.flink.api.common.functions.MapFunction;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-
-import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
-import org.apache.flink.streaming.api.CheckpointingMode;
 
 import org.apache.flink.streaming.api.TimeCharacteristic;
 
@@ -31,6 +30,7 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 
+
 import java.util.Properties;
 
 /**
@@ -39,6 +39,10 @@ import java.util.Properties;
 
 public class Job {
 
+
+    private static final String JOB_NAME = "Cowbird-Flink";
+
+    private static final String KAFKA_BROKER_CONFIG = "localhost:9092";
 
     /*  This can be a path on HDFS. */
     private static final String ROCKSDB_STATE_PATH = "file:///checkpoints/";
@@ -57,7 +61,7 @@ public class Job {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BROKER_CONFIG);
 
         return properties;
     }
@@ -94,9 +98,9 @@ public class Job {
         FlinkKafkaConsumer010<String> controlsConsumerCE = new FlinkKafkaConsumer010<String>(Topics.CONTROL_TOPIC_CE, new SimpleStringSchema(), controlsConsumerCEProperties);
 
 
-        FlinkKafkaProducer010<String> kafkaProducer = new FlinkKafkaProducer010("localhost:9092", Topics.RESULT_TOPIC, new SimpleStringSchema());
+        FlinkKafkaProducer010<String> kafkaProducer = new FlinkKafkaProducer010(KAFKA_BROKER_CONFIG, Topics.RESULT_TOPIC, new SimpleStringSchema());
 
-                DataStream<Tuple2<String,ControlMessage>> controlStreamSVE = environment.addSource(controlsConsumerSVE)
+        DataStream<Tuple2<String,ControlMessage>> controlStreamSVE = environment.addSource(controlsConsumerSVE)
                 .rebalance()
                 .map(new MapFunction<String, Tuple2<String, ControlMessage>>() {
                     @Override
@@ -118,8 +122,7 @@ public class Job {
 
                         return new Tuple2<>(Utils.getParentForExpression(sensorMessage.getExpressionId()), sensorMessage);
                     }
-               });
-
+                });
 
         DataStream<Tuple2<String, ConstantCompareControlMessage>> controlStreamCVE = environment.addSource(controlsConsumerCVE)
                 .rebalance()
@@ -134,30 +137,43 @@ public class Job {
                 });
 
 
+        DataStream<Tuple2<String, ComplexCompareControlMessage>> controlStreamCE = environment.addSource(controlsConsumerCE)
+                .rebalance()
+                .map(new MapFunction<String, Tuple2<String, ComplexCompareControlMessage>>() {
+                    @Override
+                    public Tuple2<String, ComplexCompareControlMessage> map(String json) throws Exception {
+                        ComplexCompareControlMessage complexCompareControlMessage = new ComplexCompareControlMessage();
+                        complexCompareControlMessage.initFromJSON(json);
+
+                        return new Tuple2<>(complexCompareControlMessage.getExpressionId(), complexCompareControlMessage);
+                    }
+                });
+
+
         ConnectedStreams<Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>> connectedStreamsSVE = controlStreamSVE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
-
-        connectedStreamsSVE.process(new SWANProcessFunction())
-                .map(message -> message.toJSON())
+        connectedStreamsSVE.process(new CoreProcessFunction())
                 .rebalance()
+                .map(message -> message.toJSON())
                 .addSink(kafkaProducer);
-
 
         ConnectedStreams<Tuple2<String, ConstantCompareControlMessage>, Tuple2<String, SensorMessage>> connectedStreamsCVE = controlStreamCVE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
-
         connectedStreamsCVE.flatMap(new ConstantCompareFlatMap())
-                .map(message -> message.toJSON())
                 .rebalance()
+                .map(message -> message.toJSON())
                 .addSink(kafkaProducer);
-//        connectedStreams.flatMap(new ProcessMap())
-//                .rebalance()
-//                .map(message -> message.toJSON())
-//                .addSink(new FlinkKafkaProducer010("localhost:9092", Topics.RESULT_TOPIC, new SimpleStringSchema()));
 
+        ConnectedStreams<Tuple2<String, ComplexCompareControlMessage>, Tuple2<String, SensorMessage>> connectedStreamCE = controlStreamCE
+                .connect(sensorsValuesStream)
+                .keyBy(0,0);
+        connectedStreamCE.process(new ComplexCompareProcessFunction())
+                .rebalance()
+                .map(message -> message.toJSON())
+                .addSink(kafkaProducer);
 
-        environment.execute();
+        environment.execute(JOB_NAME);
     }
 }

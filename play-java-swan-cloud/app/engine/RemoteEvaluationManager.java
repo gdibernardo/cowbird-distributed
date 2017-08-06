@@ -186,7 +186,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
             ComplexCompareControlMessage controlMessage = complexCompareControlMessage(id, expression);
 
 
-            //  Producer.sharedProducer().send(controlMessage);
+            Producer.sharedProducer().send(controlMessage);
 
             bindToSensor(controlMessage.getLeftExpressionId(), (SensorValueExpression) left, false);
             bindToSensor(controlMessage.getRightExpressionId(), (SensorValueExpression) right, false);
@@ -324,8 +324,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
             ConstantCompareControlMessage controlMessage = constantCompareControlMessage(id, expression);
 
             Producer.sharedProducer().send(controlMessage);
-
-            System.out.println("REMOTELY SENDING");
 
             String bindingId = (controlMessage.isExpressionLeft) ? id + Expression.LEFT_SUFFIX : Expression.RIGHT_SUFFIX;
             unbindFromSensor(bindingId);

@@ -1,4 +1,4 @@
-package job.swan.core;
+package processing.core;
 
 import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.result.ResultMessage;
@@ -30,7 +30,6 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
         ConstantCompareStreamState currentState = streamValueState.value();
         if(currentState == null) {
             /*  Initalizing state.  */
-            System.out.println("initializing control state for id " + value.f0);
             streamValueState.update(ConstantCompareStreamState.streamFromControlMessage(value.f1));
         } else {
             /*  Clearing state. */
@@ -45,9 +44,6 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
     public void flatMap2(Tuple2<String, SensorMessage> value, Collector<ResultMessage> out) throws Exception {
 
         ConstantCompareStreamState currentState = streamValueState.value();
-
-        System.out.println("RECEIVED A SENSOR MESSAGE IN FLAT MAP2 ConstantCompareFlatMap()");
-        System.out.println("id " + value.f0);
 
         if(currentState == null) {
             return;
@@ -95,8 +91,6 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
 
         currentState.setLastTimestamp(sensorMessage.getEventTime());
 
-        System.out.println("TRISTATE " + triState);
-        System.out.println("last " + currentState.getLastTimestamp() + " first " + currentState.getFirstTimestamp() + " length " + currentState.getHistoryLength());
         if(((currentState.getLastTimestamp() - currentState.getFirstTimestamp()) >= currentState.getHistoryLength()) && !currentState.isEvaluated) {
             /*  Ready to emit result.   */
             isReadyToEmit = true;
@@ -120,7 +114,6 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
                 resultMessage.setRightLatestTimestamp(currentState.getLastTimestamp());
             }
 
-            System.out.println("READY TO EMIT RESULT_MESSAGE!!!!");
             out.collect(resultMessage);
 
             if(!currentState.isEvaluated)

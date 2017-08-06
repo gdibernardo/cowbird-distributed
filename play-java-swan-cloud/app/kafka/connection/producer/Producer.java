@@ -2,6 +2,7 @@ package kafka.connection.producer;
 
 
 import cowbird.flink.common.config.Topics;
+import cowbird.flink.common.messages.control.ComplexCompareControlMessage;
 import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
@@ -31,9 +32,7 @@ public class Producer {
     }
 
 
-    public void send(ControlMessage controlMessage) {
-
-        String expressionId = controlMessage.getExpressionId();
+    private void handleConsumerEntryForControlMessages(String expressionId) {
 
         if(producingExpressions.contains(expressionId)) {
             producingExpressions.remove(expressionId);
@@ -42,12 +41,30 @@ public class Producer {
             producingExpressions.add(expressionId);
             Consumer.sharedConsumer().addEntry(expressionId);
         }
+    }
+
+    public void send(ControlMessage controlMessage) {
+
+        String expressionId = controlMessage.getExpressionId();
+
+        handleConsumerEntryForControlMessages(expressionId);
+
 
         String topic = Topics.CONTROL_TOPIC_SVE;
         if(controlMessage instanceof ConstantCompareControlMessage)
             topic = Topics.CONTROL_TOPIC_CVE;
 
         send(topic, controlMessage.getExpressionId(), controlMessage.toJSON());
+    }
+
+
+    public void send(ComplexCompareControlMessage controlMessage) {
+
+        String expressionId = controlMessage.getExpressionId();
+
+        handleConsumerEntryForControlMessages(expressionId);
+
+        send(Topics.CONTROL_TOPIC_CE, controlMessage.getExpressionId(), controlMessage.toJSON());
     }
 
 

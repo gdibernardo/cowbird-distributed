@@ -1,4 +1,4 @@
-package job.swan.core;
+package processing.core;
 
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class SWANProcessFunction extends CoProcessFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
+public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
 
     static final String SENSORS_VALUES_LIST_STATE_DESCRIPTOR = "SENSORS_VALUES_LIST_STATE_DESCRIPTOR";
 
@@ -52,7 +52,6 @@ public class SWANProcessFunction extends CoProcessFunction <Tuple2<String, Contr
             controlMessageValueState.update(value.f1);
         } else {
             /*  Unregister SWAN sensor value expression on Flink.   */
-            System.out.println("I am going to stop.");
             controlMessageValueState.clear();
             sensorValuesListState.clear();
         }
