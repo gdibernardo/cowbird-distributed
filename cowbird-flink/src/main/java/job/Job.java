@@ -29,6 +29,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import processing.light.LightProcessFlatMap;
 
 
 import java.util.Properties;
@@ -153,7 +154,12 @@ public class Job {
         ConnectedStreams<Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>> connectedStreamsSVE = controlStreamSVE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
-        connectedStreamsSVE.process(new CoreProcessFunction())
+//        connectedStreamsSVE.process(new CoreProcessFunction())
+//                .rebalance()
+//                .map(message -> message.toJSON())
+//                .addSink(kafkaProducer);
+
+        connectedStreamsSVE.flatMap(new LightProcessFlatMap())
                 .rebalance()
                 .map(message -> message.toJSON())
                 .addSink(kafkaProducer);

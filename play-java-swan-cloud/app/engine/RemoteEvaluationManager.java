@@ -16,9 +16,11 @@ import sensors.base.SensorInterface;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class RemoteEvaluationManager extends EvaluationManager {
 
-    /*  Minimum interval for offloading expression to Flink in ms.  */
+    /*  Minimum interval for offloading expression evaluation to Flink. */
+    /*  Interval is expressed in ms.    */
     private static long MINIMUM_INTERVAL_FOR_REMOTE_EVALUATION = 3600000;
 
     private static RemoteEvaluationManager instance = new RemoteEvaluationManager();
@@ -99,7 +101,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
     }
 
 
-    /*  Evalaution Logic methods.   */
+    /*  Evaluation Logic methods.   */
     private boolean expressionHasAnyOrAllReduction(SensorValueExpression expression) {
         return (expression.getHistoryReductionMode() == HistoryReductionMode.ANY || expression.getHistoryReductionMode() == HistoryReductionMode.ALL);
     }
@@ -196,8 +198,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
             Producer.sharedProducer().send(controlMessage);
 
-            System.out.println("REMOTELY SENDING");
-
             String bindingId = (controlMessage.isExpressionLeft) ? id + Expression.LEFT_SUFFIX : Expression.RIGHT_SUFFIX;
 
             SensorValueExpression sve = controlMessage.isExpressionLeft ? (SensorValueExpression) left : (SensorValueExpression) right;
@@ -207,7 +207,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
 
     /*  Get from Kafka the latest available result. */
-    private Result getFromKafka(String id, SensorValueExpression expression, long now) {
+    private Result getSVEFromKafka(String id, SensorValueExpression expression, long now) {
 
         ResultMessage resultMessage = Consumer.sharedConsumer().get(id);
         if(resultMessage == null) {
@@ -349,7 +349,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
 
     public Result getFromRemote(String id, SensorValueExpression expression, long now) {
-        return getFromKafka(id, expression, now);
+        return getSVEFromKafka(id, expression, now);
     }
 
 

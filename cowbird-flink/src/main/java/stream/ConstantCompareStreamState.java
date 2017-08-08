@@ -5,9 +5,9 @@ import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import interdroid.swancore.swansong.Comparator;
 import interdroid.swancore.swansong.TriState;
 
-public class ConstantCompareStreamState {
+import static cowbird.flink.common.abs.Message.INVALID_TIMESTAMP;
 
-    private static final long INVALID_TIMESTAMP = -1;
+public class ConstantCompareStreamState {
 
     private int state;
 
@@ -36,6 +36,7 @@ public class ConstantCompareStreamState {
     public void toDefaultConfiguration() {
 
         state = TriState.UNDEFINED.toCode();
+
 
         firstTimestamp = INVALID_TIMESTAMP;
         lastTimestamp = INVALID_TIMESTAMP;

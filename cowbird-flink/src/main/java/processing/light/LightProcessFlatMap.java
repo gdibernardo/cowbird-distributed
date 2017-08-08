@@ -12,15 +12,15 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction;
 import org.apache.flink.util.Collector;
 
-import stream.StreamState;
+import stream.LightStreamState;
 
 
-public class ProcessMap extends RichCoFlatMapFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
+public class LightProcessFlatMap extends RichCoFlatMapFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
 
     static final String STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME = "STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME";
     static final String CONTROL_MESSAGE_VALUE_STATE_DESCRIPTOR_NAME = "CONTROL_MESSAGE_VALUE_STATE_DESCRIPTOR_NAME";
     
-    private transient ValueState<StreamState> streamStateValueState;
+    private transient ValueState<LightStreamState> streamStateValueState;
 
     private transient ValueState<ControlMessage> controlMessageValueState;
 
@@ -28,7 +28,7 @@ public class ProcessMap extends RichCoFlatMapFunction <Tuple2<String, ControlMes
     public void flatMap1(Tuple2<String, ControlMessage> value, Collector<ResultMessage> out) throws Exception {
         ControlMessage message = controlMessageValueState.value();
 
-        if(message == null) {
+        if (message == null) {
             /*  Initializing Control request.   */
             controlMessageValueState.update(value.f1);
         } else {
@@ -40,28 +40,27 @@ public class ProcessMap extends RichCoFlatMapFunction <Tuple2<String, ControlMes
 
     }
 
+
     @Override
     public void flatMap2(Tuple2<String, SensorMessage> value, Collector<ResultMessage> out) throws Exception {
         ControlMessage controlMessage = controlMessageValueState.value();
-        StreamState currentState = streamStateValueState.value();
+        LightStreamState currentState = streamStateValueState.value();
 
-        if(controlMessage == null) {
-            streamStateValueState.clear();
+        if (controlMessage == null) {
             return;
         }
 
         SensorMessage sensorMessage = value.f1;
 
         if (currentState == null) {
-            currentState = new StreamState(sensorMessage.getExpressionId());
+            currentState = new LightStreamState(controlMessage);
         }
 
         currentState.add(sensorMessage);
 
         if (sensorMessage.getEventTime() - currentState.getFirtElementTimeStamp() >= controlMessage.getHistoryLength()) {
-            HistoryReductionMode mode = HistoryReductionMode.convert(controlMessage.getHistoryReductionMode());
 
-            Object resultValue = currentState.applyReduction(mode);
+            Object resultValue = currentState.applyReduction();
 
             if (resultValue != null) {
                 ResultMessage resultMessage = new ResultMessage(currentState.getExpressionId());
@@ -76,10 +75,11 @@ public class ProcessMap extends RichCoFlatMapFunction <Tuple2<String, ControlMes
         streamStateValueState.update(currentState);
     }
 
+
     @Override
     public void open(Configuration parameters) throws Exception {
         // super.open(parameters);
-        ValueStateDescriptor<StreamState> streamStateValueStateDescriptor = new ValueStateDescriptor<StreamState>(STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME, StreamState.class);
+        ValueStateDescriptor<LightStreamState> streamStateValueStateDescriptor = new ValueStateDescriptor<LightStreamState>(STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME, LightStreamState.class);
         streamStateValueState = getRuntimeContext().getState(streamStateValueStateDescriptor);
 
         ValueStateDescriptor<ControlMessage> controlMessageValueStateDescriptor = new ValueStateDescriptor<ControlMessage>(CONTROL_MESSAGE_VALUE_STATE_DESCRIPTOR_NAME, ControlMessage.class);

@@ -1,48 +1,60 @@
 package stream;
 
+import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
 import interdroid.swancore.swansong.HistoryReductionMode;
 
-public class StreamState {
+public class LightStreamState {
 
     private long firtElementTimeStamp;
-
     private long lastElementTimeStamp;
 
     private int size;
 
     private Object min;
-
     private Object max;
 
-    private double sum ;
+    private double sum;
 
     private String expressionId;
 
+    private RemedianMatrix remedianMatrix;
 
-    public StreamState(String expressionId) {
-        this.expressionId = expressionId;
+    private int reductionMode;
+
+    public LightStreamState(ControlMessage controlMessage) {
+        this.expressionId = controlMessage.getExpressionId();
+
+        reductionMode = controlMessage.getHistoryReductionMode();
+
+        remedianMatrix = null;
+
+        if (HistoryReductionMode.convert(reductionMode) == HistoryReductionMode.MEDIAN) {
+            /*  Init the remedian matrix.   */
+            remedianMatrix = RemedianMatrix.defaultRemedianMatrix();
+        }
 
         toDefaultState();
     }
 
+
     public void add(SensorMessage message) {
-        if(size == 0) {
+        if (size == 0) {
             firtElementTimeStamp = message.getEventTime();
         }
 
         Object messageValue = message.getValue();
 
-        if(((Comparable) min).compareTo((Comparable) messageValue) < 0) {
-            min = message.getValue();
+        if(remedianMatrix != null) {
+            remedianMatrix.addValue(messageValue);
         }
-        if(((Comparable) messageValue).compareTo((Comparable) min) < 0) {
+
+        if (((Comparable) messageValue).compareTo((Comparable) min) < 0) {
             min = messageValue;
         }
 
-
-        if(((Comparable) messageValue).compareTo((Comparable) max) > 0) {
+        if (((Comparable) messageValue).compareTo((Comparable) max) > 0) {
             max = messageValue;
         }
 
@@ -89,29 +101,32 @@ public class StreamState {
 
 
     public void toDefaultState() {
+
         min = Double.MAX_VALUE;
         max = Double.MIN_VALUE;
 
         sum = 0;
         size = 0;
+
+        remedianMatrix.initMatrix();
     }
 
-    public Object applyReduction(HistoryReductionMode mode) {
+    public Object applyReduction() {
+        HistoryReductionMode mode = HistoryReductionMode.convert(reductionMode);
+
         switch (mode) {
             case MAX:
                 return max;
             case MIN:
                 return min;
             case MEAN:
-                return sum/size;
+                return sum / size;
             case MEDIAN:
+                return remedianMatrix.getMedian();
             case ALL:
             case ANY:
             default:
                 return null;
         }
     }
-
-
-
 }

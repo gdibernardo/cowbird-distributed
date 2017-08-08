@@ -63,7 +63,7 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
 
         ControlMessage controlMessage = controlMessageValueState.value();
 
-        if(controlMessage == null) {
+        if (controlMessage == null) {
             return;
         }
 
@@ -77,8 +77,8 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
 
     @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<ResultMessage> out) throws Exception {
-        super.onTimer(timestamp, ctx, out);
-
+        // Shall I call super() e?
+        // super.onTimer(timestamp, ctx, out);
         ControlMessage controlMessage = controlMessageValueState.value();
         if(controlMessage == null) {
             return;
@@ -93,10 +93,10 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
         long oldestTimestamp = Long.MAX_VALUE;
         long latestTimestamp = Long.MIN_VALUE;
 
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             TimestampedValue timestampedValue = iterator.next();
-             /*  Same SWAN assertion.    */
-            if(timestampedValue.getTimestamp() >= (timestamp - controlMessage.getHistoryLength()))  {
+             /*  Same SWAN-framework assertion.    */
+            if (timestampedValue.getTimestamp() >= (timestamp - controlMessage.getHistoryLength()))  {
                 long currentTimestamp = timestampedValue.getTimestamp();
                 if(timestamp >= currentTimestamp) {
 
@@ -112,13 +112,13 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
             }
         }
 
-        if(values.size() == 0) {
+        if (values.size() == 0) {
             return;
         }
 
         Object resultValue = TimestampedValue.applyModeForRemoteEvaluation(values, HistoryReductionMode.convert(controlMessage.getHistoryReductionMode()));
 
-        if(resultValue != null) {
+        if (resultValue != null) {
             ResultMessage resultMessage = new ResultMessage(controlMessage.getExpressionId());
 
             resultMessage.setValue(resultValue);
@@ -132,4 +132,5 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
             out.collect(resultMessage);
         }
     }
+
 }

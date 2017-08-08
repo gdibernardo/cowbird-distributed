@@ -45,16 +45,16 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
 
         ConstantCompareStreamState currentState = streamValueState.value();
 
-        if(currentState == null) {
+        if (currentState == null) {
             return;
         }
 
         SensorMessage sensorMessage = value.f1;
 
-        if(currentState.isEvaluated) {
+        if (currentState.isEvaluated) {
             currentState.setLastTimestamp(sensorMessage.getEventTime());
 
-            if(currentState.getLastTimestamp() - currentState.getFirstTimestamp() > currentState.getHistoryLength()) {
+            if (currentState.getLastTimestamp() - currentState.getFirstTimestamp() > currentState.getHistoryLength()) {
                 currentState.toDefaultConfiguration();
             } else
                 return;
@@ -70,14 +70,14 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
 
         switch (HistoryReductionMode.convert(currentState.getHistoryReductionMode())) {
             case ALL:
-                if(triState == TriState.FALSE) {
+                if (triState == TriState.FALSE) {
                     currentState.isEvaluated = true;
                     /*  We are ready to emit result.    */
                     isReadyToEmit = true;
                 }
                 break;
             case ANY:
-                if(triState == TriState.TRUE) {
+                if (triState == TriState.TRUE) {
                     currentState.isEvaluated = true;
                     /*  We are ready to emit result.    */
                     isReadyToEmit = true;
@@ -86,17 +86,17 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
             default:break;
         }
 
-        if(!currentState.hasElements())
+        if (!currentState.hasElements())
             currentState.setFirstTimestamp(sensorMessage.getEventTime());
 
         currentState.setLastTimestamp(sensorMessage.getEventTime());
 
-        if(((currentState.getLastTimestamp() - currentState.getFirstTimestamp()) >= currentState.getHistoryLength()) && !currentState.isEvaluated) {
+        if (((currentState.getLastTimestamp() - currentState.getFirstTimestamp()) >= currentState.getHistoryLength()) && !currentState.isEvaluated) {
             /*  Ready to emit result.   */
             isReadyToEmit = true;
         }
 
-        if(isReadyToEmit) {
+        if (isReadyToEmit) {
 
             ResultMessage resultMessage = new ResultMessage(value.f0);
 
@@ -106,7 +106,7 @@ public class ConstantCompareFlatMap extends RichCoFlatMapFunction<Tuple2<String,
             resultMessage.setRightOldestTimestamp(currentState.getFirstTimestamp());
 
 
-            if(currentState.isExpressionLeft) {
+            if (currentState.isExpressionLeft) {
                 resultMessage.setLeftLatestTimestamp(currentState.getLastTimestamp());
                 resultMessage.setRightLatestTimestamp(currentState.getFirstTimestamp());
             } else {
