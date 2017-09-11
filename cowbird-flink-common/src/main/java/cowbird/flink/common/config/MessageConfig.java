@@ -1,6 +1,7 @@
 package cowbird.flink.common.config;
 
-public class MessageConfig {
+public final class MessageConfig {
+
     public static final String ID_CONFIG_KEY = "ID";
 
     public static final String INGESTION_TIME_CONFIG_KEY = "INGESTION_TIME_CONFIG_KEY";
@@ -31,4 +32,8 @@ public class MessageConfig {
 
     public static final String LEFT_HISTORY_LENGTH_CONFIG_KEY = "LEFT_HISTORY_LENGTH_CONFIG_KEY";
     public static final String RIGHT_HISTORY_LENGTH_CONFIG_KEY = "RIGHT_HISTORY_LENGTH_CONFIG_KEY";
+
+    private MessageConfig() {
+        throw new RuntimeException("You can't create an instance of this class");
+    }
 }

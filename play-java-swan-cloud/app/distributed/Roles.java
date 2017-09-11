@@ -5,10 +5,14 @@ package distributed;
  */
 
 
-public class Roles {
+public final class Roles {
     public static final String COWBIRDS_MANAGER = "cowbirds-manager";
 
     public static final String COWBIRD_FRONTEND = "cowbird-frontend";
 
     public static final String COWBIRD_NODE = "cowbird-node";
+
+    private Roles() {
+        throw new RuntimeException("You can't allocate an instance of this class");
+    }
 }

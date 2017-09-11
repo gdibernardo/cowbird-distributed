@@ -187,7 +187,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
             /*  Init complex comparison expression.    */
             ComplexCompareControlMessage controlMessage = complexCompareControlMessage(id, expression);
 
-
+            System.out.println("COMPLEX");
             Producer.sharedProducer().send(controlMessage);
 
             bindToSensor(controlMessage.getLeftExpressionId(), (SensorValueExpression) left, false);
@@ -223,6 +223,8 @@ public class RemoteEvaluationManager extends EvaluationManager {
         TimestampedValue [] reduced = new TimestampedValue[] {new TimestampedValue(resultMessage.getValue(), resultMessage.getTimestamp())};
         Result result = new Result(reduced, resultMessage.getTimestamp());
 
+//        TimestampedValue [] reduced = new TimestampedValue[] {new TimestampedValue(resultMessage.getValue(), resultMessage.getLeftLatestTimestamp())};
+//        Result result = new Result({})
         if(expression.getHistoryLength() == 0) {
             /*  Copied from getFromSensor().    */
             // we cannot defer based on values, new values will be retrieved
@@ -251,6 +253,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
         remotelyEvaluatedExpressions.add(id);
 
+        System.out.println("init remotely. ");
         if(expression instanceof ComparisonExpression)
             initializeRemoteComparisonExpression(id, (ComparisonExpression) expression);
 
@@ -264,6 +267,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
         ResultMessage resultMessage = Consumer.sharedConsumer().get(id);
 
+        System.out.println("REMOTE COMPARE");
         if(resultMessage == null) {
             Result result = new Result(now, TriState.UNDEFINED);
             result.setDeferUntil(Long.MAX_VALUE);
@@ -338,13 +342,13 @@ public class RemoteEvaluationManager extends EvaluationManager {
             return;
         }
 
-        remotelyEvaluatedExpressions.remove(id);
-
         if(expression instanceof ComparisonExpression)
             stopRemoteComparisonExpression(id, (ComparisonExpression) expression);
 
         if(expression instanceof SensorValueExpression)
             stopRemoteSensorValueExpression(id, (SensorValueExpression) expression);
+
+        remotelyEvaluatedExpressions.remove(id);
     }
 
 

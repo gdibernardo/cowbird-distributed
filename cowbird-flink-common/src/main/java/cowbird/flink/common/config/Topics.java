@@ -11,7 +11,7 @@ public final class Topics {
     public static final String CONTROL_TOPIC_CE = "CONTROL-TOPIC-CE";
 
 
-    private Topics() throws Exception {
-        throw new Exception("You can't create an instance of this class");
+    private Topics() {
+        throw new RuntimeException("You can't create an instance of this class");
     }
 }

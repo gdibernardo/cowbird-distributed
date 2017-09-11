@@ -4,7 +4,6 @@ import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.result.ResultMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
-import interdroid.swancore.swansong.HistoryReductionMode;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.java.tuple.Tuple2;

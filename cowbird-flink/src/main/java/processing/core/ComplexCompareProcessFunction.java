@@ -38,10 +38,12 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
     static final String RIGHT_SENSORS_VALUES_LIST_STATE_DESCRIPTOR = "RIGHT_SENSORS_VALUES_LIST_STATE_DESCRIPTOR";
     private transient ListState<TimestampedValue> rightValuesListState;
 
+
     @Override
     public void processElement1(Tuple2<String, ComplexCompareControlMessage> value, Context ctx, Collector<ResultMessage> out) throws Exception {
         ComplexCompareControlMessage controlMessageState = controlMessageValueState.value();
         if (controlMessageState == null) {
+            /*  Registering new current SWAN complex compare expression.    */
             controlMessageValueState.update(value.f1);
         } else {
             /*  Clearing the current state. */
@@ -50,6 +52,7 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
             rightValuesListState.clear();
         }
     }
+
 
     @Override
     public void processElement2(Tuple2<String, SensorMessage> value, Context ctx, Collector<ResultMessage> out) throws Exception {
@@ -60,9 +63,9 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
 
         SensorMessage sensorMessage = value.f1;
 
-        TimestampedValue timestampedValue = new TimestampedValue(sensorMessage, sensorMessage.getEventTime());
+        TimestampedValue timestampedValue = new TimestampedValue(sensorMessage.getValue(), sensorMessage.getEventTime());
 
-        if (sensorMessage.getExpressionId() == controlMessage.getLeftExpressionId()) {
+        if (sensorMessage.getExpressionId().equals(controlMessage.getLeftExpressionId())) {
             /*  Add to the left list state. */
             leftValuesListState.add(timestampedValue);
         } else {
@@ -73,6 +76,7 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
 
         ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + Math.max(controlMessage.getLeftHistoryLength(), controlMessage.getRightHistoryLength()));
     }
+
 
     @Override
     public void open(Configuration parameters) throws Exception {
@@ -90,11 +94,14 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
         rightValuesListState = getRuntimeContext().getListState(rightListStateDescriptor);
     }
 
+
     @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<ResultMessage> out) throws Exception {
+
         ComplexCompareControlMessage controlMessage = controlMessageValueState.value();
-        if(controlMessage == null)
+        if(controlMessage == null) {
             return;
+        }
 
         ArrayList<TimestampedValue> leftValues = new ArrayList<>();
         ArrayList<TimestampedValue> rightValues = new ArrayList<>();
@@ -102,8 +109,9 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
         Iterator<TimestampedValue> leftIterator = leftValuesListState.get().iterator();
         Iterator<TimestampedValue> rightIterator = rightValuesListState.get().iterator();
 
-        if(!leftIterator.hasNext() && !rightIterator.hasNext())
+        if(!leftIterator.hasNext() && !rightIterator.hasNext()) {
             return;
+        }
 
         leftValuesListState.clear();
         rightValuesListState.clear();

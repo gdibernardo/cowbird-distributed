@@ -108,7 +108,7 @@ public class RemedianMatrix {
 
     private Object calculateMedian(List<Double> list) {
         Collections.sort(list);
-        return list.get(columns/2);
+        return list.get(list.size()/2);
     }
 
 
@@ -135,8 +135,9 @@ public class RemedianMatrix {
                     }
                 }
 
-                Collections.sort(list);
-                cachedMedian = list.get(list.size()/2);
+//                Collections.sort(list);
+//                cachedMedian = list.get(list.size()/2);
+                cachedMedian = calculateMedian(list);
             }
         }
 

@@ -85,6 +85,11 @@ public class LightStreamState {
     }
 
 
+    public double getMedian() {
+        return (double) remedianMatrix.getMedian();
+    }
+
+
     public String getExpressionId() {
         return expressionId;
     }

@@ -2,7 +2,7 @@
 
 
 if [ $# -ne 1 ]; then
-echo $0: usage: ./init_kafka_locally.sh [path-to-Kafka ..]
+echo usage: ./$0 [path-to-Kafka ..]
 exit 1
 fi
 

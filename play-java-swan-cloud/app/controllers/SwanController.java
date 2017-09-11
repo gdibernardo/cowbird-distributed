@@ -780,7 +780,6 @@ public class SwanController extends Controller {
 
     String identifier;
 
-    int indexExpression = 0;
     public Result testRegisterTestValueSwan(){
 
 //        String myExpression = "self@test:value{MEAN,1000}";
@@ -906,13 +905,95 @@ public class SwanController extends Controller {
 
     }
 
+
+
+    /*  Do some Flink testing.  */
+    int indexExpression = 0;
+
+    public Result testComplexFlink() {
+
+        String id = "2346" + indexExpression++;
+
+        String myExpression = "self@test:value{ANY, 5000} > self@test:value{ALL, 4000}";
+
+        try {
+            ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {
+                @Override
+                public void onNewState(String id, long timestamp, TriState newState) {
+
+                    System.out.println("Flink complex id:" + id + " " +newState);
+                }
+            });
+        } catch (SwanException e) {
+            e.printStackTrace();
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+
+        return ok("Registered");
+    }
+
+
+    public Result testConstantFlink() {
+        String id = "2" + indexExpression++;
+
+        String myExpression = "self@test:value{ANY, 2000} > 5.0";
+
+        try {
+            ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {
+                @Override
+                public void onNewState(String id, long timestamp, TriState newState) {
+
+                    System.out.println("Flink constant id:" + id + " " +newState);
+                }
+            });
+        } catch (SwanException e) {
+            e.printStackTrace();
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+        return ok("Registered");
+    }
+
+
+    public Result testSVEFlink() {
+
+        String id = "test1-2345" + indexExpression++;
+        // String myExpression = "self@test:value?delay='1000'{MEAN,1000}";
+        //String myExpression = "self@test:value?delay='5000'$server_storage=FALSE{ANY,5000}";
+        String myExpression = "self@test:value{MEDIAN, 5s}";
+
+        try {
+            ExpressionManager.registerValueExpression(id, (ValueExpression) ExpressionFactory.parse(myExpression), new ValueExpressionListener() {
+                @Override
+                public void onNewValues(String id, TimestampedValue[] newValues) {
+                    if(newValues!=null && newValues.length>0) {
+                        System.out.println("Flink sve id :" + id + " " + newValues[newValues.length-1].toString());
+                    }
+                }
+            });
+        } catch (SwanException e) {
+            e.printStackTrace();
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+
+
+        return ok("Registered");
+
+
+    }
+
     public Result testRegisterTestTriStateSwan(){
 
 
         String id = "2346";
 
         // String myExpression = "self@test:value?delay='1000'{MEAN,10}";
-        String myExpression = "self@test:value{ANY, 5000} < 5.0";
+        String myExpression = "self@test:value{ANY, 5000} > self@test:value{ALL, 4000}";
 
         try {
             ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {

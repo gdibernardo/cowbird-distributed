@@ -45,7 +45,7 @@ public class ComplexCompareControlMessage extends Message {
         this.leftHistoryLength = leftHistoryLength;
 
         this.rightHistoryReductionMode = rightHistoryReductionMode;
-        this.leftHistoryLength = rightHistoryLength;
+        this.rightHistoryLength = rightHistoryLength;
 
         this.comparator = comparator;
     }

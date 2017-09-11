@@ -8,6 +8,7 @@ import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
+import org.apache.flink.api.java.utils.ParameterTool;
 import processing.core.ComplexCompareProcessFunction;
 import processing.core.ConstantCompareFlatMap;
 import processing.core.CoreProcessFunction;
@@ -32,6 +33,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import processing.light.LightProcessFlatMap;
 
 
+import java.lang.reflect.Parameter;
 import java.util.Properties;
 
 /**
@@ -40,6 +42,7 @@ import java.util.Properties;
 
 public class Job {
 
+    private static final String LIGHT_PARAMETER = "light-mode";
 
     private static final String JOB_NAME = "Cowbird-Flink";
 
@@ -67,7 +70,23 @@ public class Job {
         return properties;
     }
 
+
+    static boolean validateLightModeParameter(String lightModeArg) {
+        return lightModeArg.toLowerCase().equals("on");
+    }
+
+
     public static void main(String args[]) throws Exception {
+
+
+        ParameterTool parameterTool = ParameterTool.fromArgs(args);
+
+        boolean isLightModeEnabled = false;
+
+        if(validateLightModeParameter(parameterTool.get(LIGHT_PARAMETER, new String()))) {
+            System.out.println("SWAN light mode evaluation enabled.");
+            isLightModeEnabled = true;
+        }
 
         /*  Create streaming environment.   */
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -98,8 +117,8 @@ public class Job {
         controlsConsumerCEProperties.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_FLINK_CONTROL_TOPIC_CE_GROUP_ID);
         FlinkKafkaConsumer010<String> controlsConsumerCE = new FlinkKafkaConsumer010<String>(Topics.CONTROL_TOPIC_CE, new SimpleStringSchema(), controlsConsumerCEProperties);
 
-
         FlinkKafkaProducer010<String> kafkaProducer = new FlinkKafkaProducer010(KAFKA_BROKER_CONFIG, Topics.RESULT_TOPIC, new SimpleStringSchema());
+
 
         DataStream<Tuple2<String,ControlMessage>> controlStreamSVE = environment.addSource(controlsConsumerSVE)
                 .rebalance()
@@ -150,23 +169,27 @@ public class Job {
                     }
                 });
 
-
         ConnectedStreams<Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>> connectedStreamsSVE = controlStreamSVE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
-//        connectedStreamsSVE.process(new CoreProcessFunction())
-//                .rebalance()
-//                .map(message -> message.toJSON())
-//                .addSink(kafkaProducer);
 
-        connectedStreamsSVE.flatMap(new LightProcessFlatMap())
-                .rebalance()
-                .map(message -> message.toJSON())
-                .addSink(kafkaProducer);
+        if(isLightModeEnabled) {
+            /*  Running light topology. */
+            connectedStreamsSVE.flatMap(new LightProcessFlatMap())
+                    .rebalance()
+                    .map(message -> message.toJSON())
+                    .addSink(kafkaProducer);
+        } else {
+            connectedStreamsSVE.process(new CoreProcessFunction())
+                    .rebalance()
+                    .map(message -> message.toJSON())
+                    .addSink(kafkaProducer);
+        }
 
         ConnectedStreams<Tuple2<String, ConstantCompareControlMessage>, Tuple2<String, SensorMessage>> connectedStreamsCVE = controlStreamCVE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
+
         connectedStreamsCVE.flatMap(new ConstantCompareFlatMap())
                 .rebalance()
                 .map(message -> message.toJSON())
@@ -175,6 +198,7 @@ public class Job {
         ConnectedStreams<Tuple2<String, ComplexCompareControlMessage>, Tuple2<String, SensorMessage>> connectedStreamCE = controlStreamCE
                 .connect(sensorsValuesStream)
                 .keyBy(0,0);
+
         connectedStreamCE.process(new ComplexCompareProcessFunction())
                 .rebalance()
                 .map(message -> message.toJSON())

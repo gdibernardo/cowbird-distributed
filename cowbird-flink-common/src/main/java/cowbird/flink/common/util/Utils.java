@@ -13,7 +13,7 @@ public final class Utils {
     }
 
 
-    private Utils() throws Exception {
-        throw new Exception("You cannot create a new instance of this class.");
+    private Utils() {
+        throw new RuntimeException("You cannot create a new instance of this class.");
     }
 }
