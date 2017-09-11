@@ -36,6 +36,9 @@ GET    /registertesttristate                   controllers.SwanController.testRe
 GET    /unregistertesttristate                  controllers.SwanController.testUnregisterTestTriStateSwan
 
 
+GET    /registerSVE                             controllers.SwanController.testSVEFlink
+
+
 
 GET    /registercurrencyvalue                   controllers.SwanController.testRegisterCurrencyValueSwan
 

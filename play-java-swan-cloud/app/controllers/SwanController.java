@@ -966,25 +966,20 @@ public class SwanController extends Controller {
         String myExpression = "self@test:value{MEDIAN, 5s}";
 
         try {
-            ExpressionManager.registerValueExpression(id, (ValueExpression) ExpressionFactory.parse(myExpression), new ValueExpressionListener() {
+            ValueExpression expression = (ValueExpression) ExpressionFactory.parse(myExpression);
+            identifier = FrontendManager.sharedInstance().registerValueExpression(expression, new ValueExpressionListener() {
                 @Override
                 public void onNewValues(String id, TimestampedValue[] newValues) {
                     if(newValues!=null && newValues.length>0) {
-                        System.out.println("Flink sve id :" + id + " " + newValues[newValues.length-1].toString());
+                        System.out.println("SVEFlink Test Sensor (Value):" + newValues[newValues.length-1].toString());
                     }
                 }
             });
-        } catch (SwanException e) {
-            e.printStackTrace();
         } catch (ExpressionParseException e) {
             e.printStackTrace();
         }
 
-
-
         return ok("Registered");
-
-
     }
 
     public Result testRegisterTestTriStateSwan(){
