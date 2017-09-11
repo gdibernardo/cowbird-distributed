@@ -54,6 +54,6 @@ public abstract class NodeActor extends AbstractActor {
 
 
     public void sendToMaster(Object message) {
-        mediator.tell(new DistributedPubSubMediator.Send(pathToMaster(), message, true), getSelf());
+        mediator.tell(new DistributedPubSubMediator.Send(pathToMaster(), message, false), getSelf());
     }
 }
