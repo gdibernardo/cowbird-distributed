@@ -1,6 +1,7 @@
 package job;
 
 import cowbird.flink.common.messages.control.ComplexCompareControlMessage;
+import cowbird.flink.common.messages.result.ResultMessage;
 import cowbird.flink.common.util.Utils;
 import cowbird.flink.common.config.Topics;
 
@@ -9,6 +10,8 @@ import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import processing.core.ComplexCompareProcessFunction;
 import processing.core.ConstantCompareFlatMap;
 import processing.core.CoreProcessFunction;
@@ -47,8 +50,8 @@ public class Job {
 
     private static final String KAFKA_BROKER_CONFIG = "localhost:9092";
 
-    /*  This can be a path on HDFS. */
-    private static final String ROCKSDB_STATE_PATH = "file:///checkpoints/";
+    /*  This can be (is) a path on HDFS. */
+    private static final String ROCKSDB_STATE_PATH = "file:///user/gdiberna/cowbird_state";
 
     private static final long CHECKPOINT_INTERVAL = 5000; // ms
 
@@ -91,9 +94,9 @@ public class Job {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
 
-        // environment.enableCheckpointing(CHECKPOINT_INTERVAL, CheckpointingMode.AT_LEAST_ONCE);
+        environment.enableCheckpointing(CHECKPOINT_INTERVAL, CheckpointingMode.AT_LEAST_ONCE);
         /*  Setting RocksDB backend.    */
-        // environment.setStateBackend(new RocksDBStateBackend(ROCKSDB_STATE_PATH));
+        environment.setStateBackend(new RocksDBStateBackend(ROCKSDB_STATE_PATH));
         /*  Init sensors values Kafka source.   */
         Properties sensorValuesConsumerProperties = defaultConsumingProperties();
         sensorValuesConsumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID);
@@ -176,12 +179,22 @@ public class Job {
             /*  Running light topology. */
             connectedStreamsSVE.flatMap(new LightProcessFlatMap())
                     .rebalance()
-                    .map(message -> message.toJSON())
+                    .map(new MapFunction<ResultMessage, String>() {
+                        @Override
+                        public String map(ResultMessage message) throws Exception {
+                            return message.toJSON();
+                        }
+                    })
                     .addSink(kafkaProducer);
         } else {
             connectedStreamsSVE.process(new CoreProcessFunction())
                     .rebalance()
-                    .map(message -> message.toJSON())
+                    .map(new MapFunction<ResultMessage, String>() {
+                        @Override
+                        public String map(ResultMessage message) throws Exception {
+                            return message.toJSON();
+                        }
+                    })
                     .addSink(kafkaProducer);
         }
 
@@ -191,7 +204,12 @@ public class Job {
 
         connectedStreamsCVE.flatMap(new ConstantCompareFlatMap())
                 .rebalance()
-                .map(message -> message.toJSON())
+                .map(new MapFunction<ResultMessage, String>() {
+                    @Override
+                    public String map(ResultMessage message) throws Exception {
+                        return message.toJSON();
+                    }
+                })
                 .addSink(kafkaProducer);
 
         ConnectedStreams<Tuple2<String, ComplexCompareControlMessage>, Tuple2<String, SensorMessage>> connectedStreamCE = controlStreamCE
@@ -200,7 +218,12 @@ public class Job {
 
         connectedStreamCE.process(new ComplexCompareProcessFunction())
                 .rebalance()
-                .map(message -> message.toJSON())
+                .map(new MapFunction<ResultMessage, String>() {
+                    @Override
+                    public String map(ResultMessage message) throws Exception {
+                        return message.toJSON();
+                    }
+                })
                 .addSink(kafkaProducer);
 
         environment.execute(JOB_NAME);

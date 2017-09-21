@@ -29,7 +29,7 @@ val generalDependencies = Seq("com.fasterxml.jackson.core" % "jackson-databind" 
 
 val dependencies = flinkDependencies ++ kafkaDependencies ++ generalDependencies
 
-unmanagedJars in Compile += file("/Users/gdibernardo/Documents/cowbird/cowbird-flink-common/target/scala-2.11/cowbird-flink-common-assembly-1.0.jar")
+unmanagedJars in Compile += file("../cowbird-flink-common/target/scala-2.11/cowbird-flink-common-assembly-1.0.jar")
 
 lazy val root = (project in file(".")).
   settings(
@@ -39,7 +39,7 @@ lazy val root = (project in file(".")).
 mainClass in assembly := Some("job.Job")
 
 // make run command include the provided dependencies
-run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
+run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
 
 // exclude Scala library from assembly
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)

@@ -18,7 +18,7 @@ public class SensorPoller extends Thread {
     Object previousValue=null;
     Object currentValue;
 
-    protected long DELAY = 10000;
+    protected long DELAY = 1000;
 
 
     protected SensorPoller(String id, String valuePath, HashMap configuration){

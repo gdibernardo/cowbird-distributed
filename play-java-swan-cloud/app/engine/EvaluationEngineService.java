@@ -157,10 +157,10 @@ public class EvaluationEngineService /* implements Runnable */ {
             terminated = false;
             threadName = Thread.currentThread().getName();
             System.out.println(Thread.currentThread().getName() + " Start");
-
+            long currentTime = System.currentTimeMillis();
             doWork();
-            
-            System.out.println(Thread.currentThread().getName() + " End");
+            long taken = System.currentTimeMillis() - currentTime;
+            System.out.println(Thread.currentThread().getName() + " End. Taken: " + taken);
             terminated = true;
         }
 
@@ -195,6 +195,8 @@ public class EvaluationEngineService /* implements Runnable */ {
                         System.currentTimeMillis());
                 long end = System.currentTimeMillis();
                 long evaluationTime = (end-start);
+
+                System.out.println("evaluation time");
 
                 // update with statistics: evaluationTime and evaluationDelay
                 head.evaluated((end - start), evaluationDelay);
