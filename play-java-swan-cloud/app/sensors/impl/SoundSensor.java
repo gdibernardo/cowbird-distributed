@@ -1,83 +1,66 @@
 package sensors.impl;
 
-
 import sensors.base.AbstractSwanSensor;
 import sensors.base.SensorPoller;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
-/**
- * Created by Roshan Bharath Das on 13/06/16.
- */
+public class SoundSensor extends AbstractSwanSensor {
 
-public class TestSensor extends AbstractSwanSensor {
-
-
-    private Map<String, TestPoller> activeThreads = new HashMap<String, TestPoller>();
+    private Map<String, SoundPoller> activeThreads = new HashMap<String, SoundPoller>();
 
     public static final String VALUE = "value";
 
+    class SoundPoller extends SensorPoller {
 
-    class TestPoller extends SensorPoller {
+        private long SENSOR_DELAY = 500;
 
-        float i=0;
+        float i = 0;
 
         Random rand = new Random();
-        float minX = 0.0f;
-        float maxX = 10000.0f;
 
+        float min = 0.0f;
+        float max = 100.0f;
 
-        TestPoller(String id, String valuePath, HashMap configuration) {
+        SoundPoller(String id, String valuePath, HashMap configuration) {
             super(id, valuePath, configuration);
         }
 
-
         public void run() {
             while (!isInterrupted()) {
-
-                //System.out.println("Test poller running");
                 long now = System.currentTimeMillis();
 
+                i = rand.nextFloat() * (max - min) + min;
 
-                //i ^= 1;
-                i = rand.nextFloat() * (maxX - minX) + minX;
+                updateResult(SoundSensor.this, i, now);
 
-                System.out.println("DELAY="+DELAY+ " I value="+i);
-
-                updateResult(TestSensor.this,i,now);
-
-               try {
-                    Thread.sleep(DELAY);
+                try {
+                    Thread.sleep(SENSOR_DELAY);
                 } catch (InterruptedException e) {
                     break;
                 }
-
             }
         }
     }
-
-
 
     @Override
     public void register(String id, String valuePath, HashMap configuration, HashMap httpConfiguration) {
 
         super.register(id,valuePath,configuration,httpConfiguration);
 
-        /*getValues().put(valuePath,
-                Collections.synchronizedList(new ArrayList<TimestampedValue>()));*/
+        SoundPoller soundPoller = new SoundPoller(id, valuePath, configuration);
 
-        TestPoller testPoller = new TestPoller(id, valuePath,
-                configuration);
-
-        activeThreads.put(id, testPoller);
-        testPoller.start();
+        activeThreads.put(id, soundPoller);
+        soundPoller.start();
 
     }
 
     @Override
     public void unregister(String id) {
         super.unregister(id);
-        System.out.println("Unregister sensor called");
+        System.out.println("SoundSensor:    Unregister sensor called.");
         activeThreads.remove(id).interrupt();
     }
 
@@ -89,7 +72,7 @@ public class TestSensor extends AbstractSwanSensor {
 
     @Override
     public String getEntity() {
-        return "test";
+        return "sound";
     }
 
     @Override
@@ -97,9 +80,8 @@ public class TestSensor extends AbstractSwanSensor {
         return new String[] {"delay"};
     }
 
-
     @Override
     public boolean isHighFrequency() {
-        return true;
+        return false;
     }
 }

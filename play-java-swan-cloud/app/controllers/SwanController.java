@@ -963,7 +963,7 @@ public class SwanController extends Controller {
         String id = "test1-2345" + indexExpression++;
         // String myExpression = "self@test:value?delay='1000'{MEAN,1000}";
         //String myExpression = "self@test:value?delay='5000'$server_storage=FALSE{ANY,5000}";
-        String myExpression = "self@test:value{MEDIAN, 5s}";
+        String myExpression = "self@sound:value{MEAN, 5000}";
 
         try {
             ValueExpression expression = (ValueExpression) ExpressionFactory.parse(myExpression);
@@ -975,6 +975,26 @@ public class SwanController extends Controller {
                     }
                 }
             });
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+        return ok("Registered");
+    }
+
+    public Result testSound() {
+        String id = "test1-2345" + indexExpression++;
+        String myExpression = "self@sound:value{MEAN, 5000} > 50.0";
+
+        try {
+            TriStateExpression expression = (TriStateExpression) ExpressionFactory.parse(myExpression);
+            identifier = FrontendManager.sharedInstance().registerTriStateExpression(expression, new TriStateExpressionListener() {
+                @Override
+                public void onNewState(String id, long timestamp, TriState newState) {
+                    System.out.println("Sound sensor test - id: " + id + ", state: " + newState);
+                }
+            });
+
         } catch (ExpressionParseException e) {
             e.printStackTrace();
         }

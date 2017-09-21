@@ -51,7 +51,7 @@ public class Job {
     private static final String KAFKA_BROKER_CONFIG = "localhost:9092";
 
     /*  This can be (is) a path on HDFS. */
-    private static final String ROCKSDB_STATE_PATH = "file:///user/gdiberna/cowbird_state";
+    private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
 
     private static final long CHECKPOINT_INTERVAL = 5000; // ms
 
