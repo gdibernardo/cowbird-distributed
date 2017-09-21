@@ -47,10 +47,10 @@ public class Job {
 
     private static final String JOB_NAME = "Cowbird-Flink";
 
-    private static final String KAFKA_BROKER_CONFIG = "localhost:9092";
+    private static final String KAFKA_BROKER_CONFIG = "kafka-gdiberna-0.sda.surf-hosted.nl:9092";
 
     /*  This can be (is) a path on HDFS. */
-    // private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
+    private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
 
     private static final long CHECKPOINT_INTERVAL = 5000; // ms
 
@@ -93,9 +93,9 @@ public class Job {
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
         environment.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
 
-        // environment.enableCheckpointing(CHECKPOINT_INTERVAL, CheckpointingMode.AT_LEAST_ONCE);
+        environment.enableCheckpointing(CHECKPOINT_INTERVAL, CheckpointingMode.AT_LEAST_ONCE);
         /*  Setting RocksDB backend.    */
-        // environment.setStateBackend(new RocksDBStateBackend(ROCKSDB_STATE_PATH));
+        environment.setStateBackend(new RocksDBStateBackend(ROCKSDB_STATE_PATH));
         /*  Init sensors values Kafka source.   */
         Properties sensorValuesConsumerProperties = defaultConsumingProperties();
         sensorValuesConsumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID);

@@ -51,7 +51,6 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
         if(controlMessage == null) {
             /*  Initalizing SWAN Sensor Value on Flink. */
             controlMessageValueState.update(value.f1);
-            System.out.println("PROCESSING REGISTERED");
         } else {
             /*  Unregister SWAN sensor value expression on Flink.   */
             controlMessageValueState.clear();
@@ -68,7 +67,7 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
         if (controlMessage == null) {
             return;
         }
-        System.out.println("RECEIVING VALUEs");
+
         TimestampedValue timestampedValue = new TimestampedValue(value.f1.getValue(), value.f1.getEventTime());
         sensorValuesListState.add(timestampedValue);
 
