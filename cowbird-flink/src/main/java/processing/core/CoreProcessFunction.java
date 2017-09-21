@@ -78,9 +78,8 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
 
     @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<ResultMessage> out) throws Exception {
-        // Shall I call super() e?
+        // Shall I call super() ?!
         // super.onTimer(timestamp, ctx, out);
-        System.out.println("CALLED ON TIMER");
         ControlMessage controlMessage = controlMessageValueState.value();
         if(controlMessage == null) {
             return;
