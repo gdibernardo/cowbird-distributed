@@ -113,7 +113,9 @@ public class LightStreamState {
         sum = 0;
         size = 0;
 
-        remedianMatrix.initMatrix();
+        if(remedianMatrix != null) {
+            remedianMatrix.initMatrix();
+        }
     }
 
     public Object applyReduction() {

@@ -119,12 +119,12 @@ public class CowbirdManager extends AbstractActor {
                     Member member = unreachableMember.member();
                     if(member.hasRole(Roles.COWBIRD_NODE)) {
                         log.info("Cowbird node detected as unreacheable {}", member);
-                        CowbirdState state = hostCowbirdMap.get(member.address().hostPort());
-                        handleCowbirdDisconnection(state);
+//                        CowbirdState state = hostCowbirdMap.get(member.address().hostPort());
+//                        handleCowbirdDisconnection(state);
                     }
                     if(unreachableMember.member().hasRole(Roles.COWBIRD_FRONTEND)) {
                         log.info("Frontend node detected as unreacheable {}", member);
-                        handleFrontendDisconnection(member);
+//                        handleFrontendDisconnection(member);
                     }
                 })
                 .build();

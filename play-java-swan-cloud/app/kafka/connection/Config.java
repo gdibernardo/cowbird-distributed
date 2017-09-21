@@ -1,6 +1,6 @@
 package kafka.connection;
 
-import kafka.connection.consumer.Consumer;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 

@@ -672,7 +672,6 @@ public class EvaluationManager {
 
         if (left.getValues().length == 0 || right.getValues().length == 0) {
            // Log.d(TAG, "No data for: " + expression);
-            System.out.println("Is this condition right?");
             Result result = new Result(now, TriState.UNDEFINED);
             result.setDeferUntil(Long.MAX_VALUE);
             result.setDeferUntilGuaranteed(false);

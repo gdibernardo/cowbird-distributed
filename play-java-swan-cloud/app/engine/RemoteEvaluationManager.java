@@ -187,7 +187,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
             /*  Init complex comparison expression.    */
             ComplexCompareControlMessage controlMessage = complexCompareControlMessage(id, expression);
 
-            System.out.println("COMPLEX");
             Producer.sharedProducer().send(controlMessage);
 
             bindToSensor(controlMessage.getLeftExpressionId(), (SensorValueExpression) left, false);
@@ -253,7 +252,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
         remotelyEvaluatedExpressions.add(id);
 
-        System.out.println("init remotely. ");
+        System.out.println("Init expression remotely. ");
         if(expression instanceof ComparisonExpression)
             initializeRemoteComparisonExpression(id, (ComparisonExpression) expression);
 
@@ -267,7 +266,8 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
         ResultMessage resultMessage = Consumer.sharedConsumer().get(id);
 
-        System.out.println("REMOTE COMPARE");
+        System.out.println("Remote comparing expression.");
+
         if(resultMessage == null) {
             Result result = new Result(now, TriState.UNDEFINED);
             result.setDeferUntil(Long.MAX_VALUE);

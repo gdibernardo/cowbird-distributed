@@ -267,7 +267,6 @@ public class EvaluationEngineService /* implements Runnable */ {
             return;
         }
         try {
-            System.out.println("CALLED!");
             mEvaluationManager.initialize(id, expression);
         } catch (SensorConfigurationException e) {
             // FAIL!
@@ -370,8 +369,7 @@ public class EvaluationEngineService /* implements Runnable */ {
 
     public void sendUpdate(QueuedExpression queued, Result result) {
 
-        System.out.println("IS THIS SHIT CALLED????");
-            // we know it has changed
+        // we know it has changed
          //   if (queued.getId().contains(Expression.SEPARATOR)) {
               /*  sendUpdateToRemote(queued.getId().split(Expression.SEPARATOR)[0],
                         queued.getId().split(Expression.SEPARATOR)[1], result); */
