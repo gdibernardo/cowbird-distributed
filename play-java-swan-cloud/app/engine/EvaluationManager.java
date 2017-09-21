@@ -94,11 +94,11 @@ public class EvaluationManager {
             if (((SensorValueExpression) expression).getEntity().equals("time")) {
                 return;
             }
-            // do the real work here, bind to the sensor.
-            SensorValueExpression expression1; // What is this?
 
-            if(RemoteEvaluationManager.sharedInstance().isExpressionEligibleForRemoteEvaluation(expression))
+            if(RemoteEvaluationManager.sharedInstance().isExpressionEligibleForRemoteEvaluation(expression)) {
+                /*  Initialize remotely.    */
                 RemoteEvaluationManager.sharedInstance().initializeRemotely(id, expression);
+            }
             else
                 bindToSensor(id, (SensorValueExpression) expression, false);
         }
@@ -267,7 +267,7 @@ public class EvaluationManager {
                     expression.getHistoryLength());
 
 
-            System.out.println("Evaluation time (value size):"+values.size());
+            //  System.out.println("Evaluation time (value size):"+values.size());
 
             // TODO if values is empty, should we not just defer until forever?
             // And can values be null at all?

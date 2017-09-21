@@ -5,6 +5,7 @@ import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.result.ResultMessage;
 
+import cowbird.flink.common.util.Utils;
 import interdroid.swancore.swansong.*;
 
 import kafka.connection.consumer.Consumer;
@@ -13,11 +14,17 @@ import kafka.connection.producer.Producer;
 import sensors.base.SensorFactory;
 import sensors.base.SensorInterface;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 public class RemoteEvaluationManager extends EvaluationManager {
+
+    private enum RemoteExpressionType {
+        SENSOR_VALUE_EXPRESSION,
+        COMPARISON_EXPRESSION
+    }
 
     /*  Minimum interval for offloading expression evaluation to Flink. */
     /*  Interval is expressed in ms.    */
@@ -29,8 +36,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
         return instance;
     }
 
-    private final Set<String> remotelyEvaluatedExpressions = new HashSet<>();
-
+    private final Map<String, RemoteExpressionType> remotelyEvaluatedExpressions = new HashMap<>();
 
     private static ComplexCompareControlMessage complexCompareControlMessage(String id, ComparisonExpression expression) {
         Expression left = expression.getLeft();
@@ -204,7 +210,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
         }
     }
 
-
     /*  Get from Kafka the latest available result. */
     private Result getSVEFromKafka(String id, SensorValueExpression expression, long now) {
 
@@ -244,20 +249,23 @@ public class RemoteEvaluationManager extends EvaluationManager {
     /*  Initialize the evaluation on the streaming data pipeline.   */
     public void initializeRemotely(String id, Expression expression) throws SensorConfigurationException, SensorSetupFailedException {
 
-        if(remotelyEvaluatedExpressions.contains(id)) {
+        if(remotelyEvaluatedExpressions.containsKey(id)) {
             /*  Raise an exception. */
             System.out.println("Expression already registered remotely.");
             return;
         }
 
-        remotelyEvaluatedExpressions.add(id);
-
         System.out.println("Init expression remotely. ");
-        if(expression instanceof ComparisonExpression)
-            initializeRemoteComparisonExpression(id, (ComparisonExpression) expression);
 
-        if(expression instanceof SensorValueExpression)
+        if(expression instanceof ComparisonExpression) {
+            remotelyEvaluatedExpressions.put(id, RemoteExpressionType.COMPARISON_EXPRESSION);
+            initializeRemoteComparisonExpression(id, (ComparisonExpression) expression);
+        }
+
+        if(expression instanceof SensorValueExpression) {
+            remotelyEvaluatedExpressions.put(id, RemoteExpressionType.SENSOR_VALUE_EXPRESSION);
             initializeRemoteSensorValueExpression(id, (SensorValueExpression) expression);
+        }
     }
 
 
@@ -265,8 +273,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
     public Result doRemoteCompare(String id, ComparisonExpression expression, long now) {
 
         ResultMessage resultMessage = Consumer.sharedConsumer().get(id);
-
-        System.out.println("Remote comparing expression.");
 
         if(resultMessage == null) {
             Result result = new Result(now, TriState.UNDEFINED);
@@ -276,8 +282,6 @@ public class RemoteEvaluationManager extends EvaluationManager {
         }
 
         TriState tristateResult = TriState.fromCode((Integer) resultMessage.getValue());
-
-        System.out.println("Result " + tristateResult);
 
         DeferUntilResult leftDefer = remainsValidUntil(expression.getLeft(),
                 System.currentTimeMillis(),
@@ -336,7 +340,7 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
 
     public void stopRemotely(String id, Expression expression) {
-        if(!remotelyEvaluatedExpressions.contains(id)) {
+        if(!remotelyEvaluatedExpressions.containsKey(id)) {
             /*  Exception should probably be raised.    */
             System.out.println("Expression not registered remotely. ");
             return;
@@ -358,7 +362,17 @@ public class RemoteEvaluationManager extends EvaluationManager {
 
 
     public boolean isEvaluatingExpression(String expressionId) {
-        return remotelyEvaluatedExpressions.contains(expressionId);
+        return remotelyEvaluatedExpressions.containsKey(expressionId);
+    }
+
+
+    public String getTransmissionIdentifierForSensor(String sensorId) {
+
+        if(remotelyEvaluatedExpressions.containsKey(sensorId)) {
+            return sensorId;
+        }
+
+        return Utils.getParentForExpression(sensorId);
     }
 
 

@@ -52,10 +52,14 @@ public abstract class AbstractSwanSensor implements SensorInterface {
                                           final String id, final long now, final Object value /*, final int historySize*/) {
 
 
-            System.out.println("putValueTrimSize:"+value+" "+valuePath);
+        System.out.println("putValueTrimSize:"+value+" "+valuePath);
 
         if(RemoteEvaluationManager.sharedInstance().isPollingFromSensor(id)) {
-            SensorMessage message = new SensorMessage(id, value, now, now);
+
+            SensorMessage message = new SensorMessage(RemoteEvaluationManager.sharedInstance().getTransmissionIdentifierForSensor(id),
+                    value,
+                    now,
+                    now);
             /*  Send asynchronously.    */
             Producer.sharedProducer().send(message);
         } else {

@@ -42,6 +42,9 @@ GET    /registerSVE                             controllers.SwanController.testS
 GET     /testSound                              controllers.SwanController.testSound
 
 
+GET     /testSoundLocal                         controllers.SwanController.testSound_local
+
+
 
 GET    /registercurrencyvalue                   controllers.SwanController.testRegisterCurrencyValueSwan
 

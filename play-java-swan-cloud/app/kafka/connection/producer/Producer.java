@@ -28,6 +28,7 @@ public class Producer {
 
 
     public void send(SensorMessage sensorMessage) {
+        System.out.println("sensor id " + sensorMessage.getExpressionId());
         send(Topics.SENSORS_VALUES_TOPIC, sensorMessage.getExpressionId(), sensorMessage.toJSON());
     }
 
@@ -54,6 +55,7 @@ public class Producer {
         if(controlMessage instanceof ConstantCompareControlMessage)
             topic = Topics.CONTROL_TOPIC_CVE;
 
+        System.out.println(" id ctrl " + controlMessage.getExpressionId());
         send(topic, controlMessage.getExpressionId(), controlMessage.toJSON());
     }
 

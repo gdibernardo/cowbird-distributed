@@ -156,11 +156,9 @@ public class EvaluationEngineService /* implements Runnable */ {
         public void run() {
             terminated = false;
             threadName = Thread.currentThread().getName();
-            System.out.println(Thread.currentThread().getName() + " Start");
-            long currentTime = System.currentTimeMillis();
+            // System.out.println(Thread.currentThread().getName() + " Start");
             doWork();
-            long taken = System.currentTimeMillis() - currentTime;
-            System.out.println(Thread.currentThread().getName() + " End. Taken: " + taken);
+
             terminated = true;
         }
 
@@ -189,15 +187,14 @@ public class EvaluationEngineService /* implements Runnable */ {
                 }
 
                 long start = System.currentTimeMillis();
-                System.out.println("Calling evaluate from engine service for " + head.getId());
+                // System.out.println("Calling evaluate from engine service for " + head.getId());
                 result = mEvaluationManager.evaluate(
                         head.getId(), head.getExpression(),
                         System.currentTimeMillis());
                 long end = System.currentTimeMillis();
                 long evaluationTime = (end-start);
 
-                System.out.println("evaluation time");
-
+                System.out.println("Evaluation time: " + evaluationTime + "ms");
                 // update with statistics: evaluationTime and evaluationDelay
                 head.evaluated((end - start), evaluationDelay);
 
@@ -250,7 +247,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                     }
 
 //                    System.out.println("Terminating thread: " + thread.getThreadName());
-                    System.out.println("DONE: " + thread.getThreadName());
+                      // System.out.println("DONE: " + thread.getThreadName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

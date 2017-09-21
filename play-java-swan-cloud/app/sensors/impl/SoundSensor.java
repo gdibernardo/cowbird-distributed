@@ -82,6 +82,6 @@ public class SoundSensor extends AbstractSwanSensor {
 
     @Override
     public boolean isHighFrequency() {
-        return false;
+        return true;
     }
 }

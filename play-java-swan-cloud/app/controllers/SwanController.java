@@ -1002,6 +1002,31 @@ public class SwanController extends Controller {
         return ok("Registered");
     }
 
+
+    public Result testSound_local() {
+        String id = "test1-2345" + indexExpression++;
+        String myExpression = "self@sound:value{MEAN, 5000} > 50.0";
+
+        try {
+            ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {
+                @Override
+                public void onNewState(String id, long timestamp, TriState newState) {
+
+                    System.out.println("Test sound local id: " + id + " " +newState);
+                }
+            });
+        } catch (SwanException e) {
+            e.printStackTrace();
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+        return ok("Registered");
+    }
+
+
+
+
     public Result testRegisterTestTriStateSwan(){
 
 
