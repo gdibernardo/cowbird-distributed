@@ -62,4 +62,13 @@ public class CowbirdConfiguration {
     public void decreaseCurrentLoad(int delta) {
         currentLoad.decrementAndGet();
     }
+
+
+    public int hashCode() {
+        if(cowbirdInstance != null) {
+            return cowbirdInstance.hashCode();
+        }
+
+        return 0;
+    }
 }

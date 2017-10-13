@@ -9,8 +9,12 @@ import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
 import org.apache.flink.api.java.utils.ParameterTool;
+
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
+
+import org.apache.kafka.common.serialization.StringSerializer;
 import processing.core.ComplexCompareProcessFunction;
 import processing.core.ConstantCompareFlatMap;
 import processing.core.CoreProcessFunction;
@@ -32,7 +36,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer010;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import processing.light.LightProcessFlatMap;
+import processing.light.StreamingProcessFlatMap;
 
 
 import java.util.Properties;
@@ -52,7 +56,10 @@ public class Job {
     /*  This can be (is) a path on HDFS. */
     private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
 
-    private static final long CHECKPOINT_INTERVAL = 5000; // ms
+    private static final String FS_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_fs_state";
+
+    // private static final String ROCKSDB_STATE_PATH = "file:///Users/gdibernardo/Documents/cowbird/cowbird_state";
+    private static final long CHECKPOINT_INTERVAL = 3600000; // ms
 
     public static final String CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID = "CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID";
 
@@ -62,15 +69,15 @@ public class Job {
 
     public static final String CLIENT_ID = "CLIENT_ID";
 
+
     public static Properties defaultConsumingProperties() {
         Properties properties = new Properties();
+
         properties.put(ConsumerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_BROKER_CONFIG);
-
         return properties;
     }
-
 
     static boolean validateLightModeParameter(String lightModeArg) {
         return lightModeArg.toLowerCase().equals("on");
@@ -85,7 +92,7 @@ public class Job {
         boolean isLightModeEnabled = false;
 
         if(validateLightModeParameter(parameterTool.get(LIGHT_PARAMETER, new String()))) {
-            System.out.println("SWAN light mode evaluation enabled.");
+            System.out.println("SWAN light mode (streaming-oriented) evaluation enabled.");
             isLightModeEnabled = true;
         }
 
@@ -96,6 +103,10 @@ public class Job {
         environment.enableCheckpointing(CHECKPOINT_INTERVAL, CheckpointingMode.AT_LEAST_ONCE);
         /*  Setting RocksDB backend.    */
         environment.setStateBackend(new RocksDBStateBackend(ROCKSDB_STATE_PATH));
+
+        /*  Setting Fs backend. */
+        // environment.setStateBackend(new FsStateBackend(FS_STATE_PATH, true));
+
         /*  Init sensors values Kafka source.   */
         Properties sensorValuesConsumerProperties = defaultConsumingProperties();
         sensorValuesConsumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID);
@@ -176,7 +187,7 @@ public class Job {
 
         if(isLightModeEnabled) {
             /*  Running light topology. */
-            connectedStreamsSVE.flatMap(new LightProcessFlatMap())
+            connectedStreamsSVE.flatMap(new StreamingProcessFlatMap())
                     .rebalance()
                     .map(new MapFunction<ResultMessage, String>() {
                         @Override
@@ -184,7 +195,8 @@ public class Job {
                             return message.toJSON();
                         }
                     })
-                    .addSink(kafkaProducer);
+                    //.addSink(kafkaProducer);
+                    .addSink( new FlinkKafkaProducer010(KAFKA_BROKER_CONFIG, Topics.RESULT_TOPIC, new SimpleStringSchema()));
         } else {
             connectedStreamsSVE.process(new CoreProcessFunction())
                     .rebalance()
@@ -223,7 +235,7 @@ public class Job {
                         return message.toJSON();
                     }
                 })
-                .addSink(kafkaProducer);
+                .addSink(new FlinkKafkaProducer010(KAFKA_BROKER_CONFIG, Topics.RESULT_TOPIC, new SimpleStringSchema()));
 
         environment.execute(JOB_NAME);
     }

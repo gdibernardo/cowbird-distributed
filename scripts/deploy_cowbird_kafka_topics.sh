@@ -10,12 +10,12 @@ fi
 path_to_kafka=$1
 
 
-sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic SENSORS-VALUE-TOPIC
+sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic STREAMS-SENSORS-VALUE-TOPIC
 
-sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic CONTROL-TOPIC-SVE
+sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic STREAMS-CONTROL-TOPIC-SVE
 
-sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic CONTROL-TOPIC-CVE
+sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic STREAMS-CONTROL-TOPIC-CVE
 
-sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic CONTROL-TOPIC-CE
+sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic STREAMS-CONTROL-TOPIC-CE
 
-sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic RESULT-TOPIC
+sh $path_to_kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 1 --replication-factor 1 --topic STREAMS-RESULT-TOPIC

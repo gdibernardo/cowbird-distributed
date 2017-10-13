@@ -15,14 +15,14 @@ public class SoundSensor extends AbstractSwanSensor {
 
     class SoundPoller extends SensorPoller {
 
-        private long SENSOR_DELAY = 500;
+        private long SENSOR_DELAY = 1000;
 
         float i = 0;
 
         Random rand = new Random();
 
         float min = 0.0f;
-        float max = 100.0f;
+        float max = 130.0f;
 
         SoundPoller(String id, String valuePath, HashMap configuration) {
             super(id, valuePath, configuration);

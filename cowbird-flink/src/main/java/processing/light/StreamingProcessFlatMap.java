@@ -14,7 +14,7 @@ import org.apache.flink.util.Collector;
 import stream.LightStreamState;
 
 
-public class LightProcessFlatMap extends RichCoFlatMapFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
+public class StreamingProcessFlatMap extends RichCoFlatMapFunction <Tuple2<String, ControlMessage>, Tuple2<String, SensorMessage>, ResultMessage> {
 
     static final String STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME = "STREAM_STATE_VALUE_STATE_DESCRIPTOR_NAME";
     static final String CONTROL_MESSAGE_VALUE_STATE_DESCRIPTOR_NAME = "CONTROL_MESSAGE_VALUE_STATE_DESCRIPTOR_NAME";
@@ -63,8 +63,9 @@ public class LightProcessFlatMap extends RichCoFlatMapFunction <Tuple2<String, C
 
             if (resultValue != null) {
                 ResultMessage resultMessage = new ResultMessage(currentState.getExpressionId());
-                resultMessage.setTimestamp(System.currentTimeMillis());
+
                 resultMessage.setValue(resultValue);
+
                 out.collect(resultMessage);
             }
 

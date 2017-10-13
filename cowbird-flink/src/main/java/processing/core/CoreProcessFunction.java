@@ -71,8 +71,9 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
         TimestampedValue timestampedValue = new TimestampedValue(value.f1.getValue(), value.f1.getEventTime());
         sensorValuesListState.add(timestampedValue);
 
-        // ctx.timerService().registerEventTimeTimer(timestampedValue.getTimestamp() + controlMessage.getHistoryLength());
-        ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + controlMessage.getHistoryLength());
+         //ctx.timerService().registerEventTimeTimer(timestampedValue.getTimestamp() + controlMessage.getHistoryLength());
+        // ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + controlMessage.getHistoryLength());
+        ctx.timerService().registerProcessingTimeTimer(timestampedValue.getTimestamp() + controlMessage.getHistoryLength());
     }
 
 
@@ -129,6 +130,8 @@ public class CoreProcessFunction extends CoProcessFunction <Tuple2<String, Contr
 
             resultMessage.setLeftOldestTimestamp(oldestTimestamp);
             resultMessage.setRightOldestTimestamp(oldestTimestamp);
+
+            // System.out.println("Emitted result for expression with identifier: " + controlMessage.getExpressionId());
 
             out.collect(resultMessage);
         }

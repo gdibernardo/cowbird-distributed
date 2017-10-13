@@ -52,20 +52,21 @@ public abstract class AbstractSwanSensor implements SensorInterface {
                                           final String id, final long now, final Object value /*, final int historySize*/) {
 
 
-        // System.out.println("putValueTrimSize:"+value+" "+valuePath);
+        // System.out.println("putValueTrimSize: "+value+" "+valuePath + " sensor id " + id);
         if(RemoteEvaluationManager.sharedInstance().isPollingFromSensor(id)) {
 
             SensorMessage message = new SensorMessage(RemoteEvaluationManager.sharedInstance().getTransmissionIdentifierForSensor(id),
                     value,
                     now,
                     now);
-            /*  Send asynchronously.    */
+            /*  Send the message asynchronously.    */
             Producer.sharedProducer().send(message);
         } else {
             try {
                 //TODO: Two id's with same valupath and different configuration gives different result. This is not handled currently.
                 getValues().get(valuePath).add(new TimestampedValue(value, now));
             } catch (OutOfMemoryError e) {
+                System.out.println("ALERT   -   Out of memory");
                 onDestroySensor();
             }
         }
