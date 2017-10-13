@@ -1,6 +1,7 @@
 package processing.core;
 
 
+import com.jcraft.jsch.MAC;
 import cowbird.flink.common.messages.control.ComplexCompareControlMessage;
 import cowbird.flink.common.messages.result.ResultMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
@@ -74,7 +75,9 @@ public class ComplexCompareProcessFunction extends CoProcessFunction <Tuple2<Str
         }
 
 
-        ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + Math.max(controlMessage.getLeftHistoryLength(), controlMessage.getRightHistoryLength()));
+        // ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + Math.max(controlMessage.getLeftHistoryLength(), controlMessage.getRightHistoryLength()));
+        ctx.timerService().registerProcessingTimeTimer(sensorMessage.getEventTime() + Math.max(controlMessage.getLeftHistoryLength(), controlMessage.getRightHistoryLength()));
+
     }
 
 

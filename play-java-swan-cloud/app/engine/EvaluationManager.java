@@ -2,6 +2,7 @@ package engine;
 
 import distributed.node.CowbirdConfiguration;
 
+import engine.remote.RemoteEvaluationManager;
 import interdroid.swancore.swansong.*;
 
 import interdroid.swancore.swansong.Comparator;
@@ -313,7 +314,7 @@ public class EvaluationManager {
 
     public Result evaluate(String id, Expression expression, long now)
             throws SwanException {
-        //System.out.println("evaluate method: start");
+
         if (expression == null) {
             throw new RuntimeException("This should not happen! Please debug");
         }
@@ -723,8 +724,15 @@ public class EvaluationManager {
         comparatorResult.setDeferUntilGuaranteed(leftDefer.guaranteed
                 && rightDefer.guaranteed);
 
+
+        if(RemoteEvaluationManager.sharedInstance().isEvaluatingExpression(id)) {
+            comparatorResult.setDeferUntilGuaranteed(false);
+        }
+
         /*  Is this a bug?  */
-        comparatorResult.setDeferUntil(Math.min(leftDefer.deferUntil,
+//        comparatorResult.setDeferUntil(Math.min(leftDefer.deferUntil,
+//                leftDefer.deferUntil));
+        comparatorResult.setDeferUntil(Math.min(rightDefer.deferUntil,
                 leftDefer.deferUntil));
 
         return comparatorResult;

@@ -6,16 +6,16 @@ import cowbird.flink.common.messages.result.ResultMessage;
 
 import kafka.connection.Config;
 
-import kafka.connection.LatencyController;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
+
+//import org.apache.kafka.common.TopicPartition;
+//import java.util.List;
 
 class ConsumerLoop implements Runnable {
 
@@ -33,7 +33,7 @@ class ConsumerLoop implements Runnable {
 
         kafkaConsumer = new KafkaConsumer<>(Config.defaultConsumingProperties());
 
-        kafkaConsumer.subscribe(Arrays.asList(Topics.RESULT_TOPIC));
+        kafkaConsumer.subscribe(Collections.singletonList(Topics.RESULT_TOPIC));
 
 //        TopicPartition topicPartition = new TopicPartition(Topics.RESULT_TOPIC, 0);
 //        List<TopicPartition> topicPartitionList = Arrays.asList(topicPartition);
@@ -60,13 +60,10 @@ class ConsumerLoop implements Runnable {
                     ResultMessage resultMessage = new ResultMessage();
                     resultMessage.initFromJSON(record.value());
 
-                    String identifier = resultMessage.getExpressionId();
-
-                    long taken = System.currentTimeMillis() - LatencyController.sharedInstance().get(identifier);
-
-                    System.out.println("Got some result from Kafka. Latency: " + taken + " ms");
-                    System.out.flush();
-                    LatencyController.sharedInstance().remove(identifier);
+//                    String identifier = resultMessage.getExpressionId();
+//
+//                    System.out.println("Got some result from Kafka with identifier: " + identifier + ".");
+//                    System.out.flush();
 
                     consumer.appendResult(resultMessage);
                 }

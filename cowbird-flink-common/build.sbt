@@ -8,8 +8,8 @@ scalaVersion := "2.11.11"
 
 
 libraryDependencies ++= Seq(
-  "org.apache.kafka" % "kafka_2.11" % "0.11.0.0",
-  //"org.apache.kafka" % "kafka_2.11" % "0.10.2.1",
+  //"org.apache.kafka" % "kafka_2.11" % "0.11.0.0",
+  "org.apache.kafka" % "kafka_2.11" % "0.10.2.1",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.0.pr4",
   "org.json"%"org.json"%"chargebee-1.0"
 )

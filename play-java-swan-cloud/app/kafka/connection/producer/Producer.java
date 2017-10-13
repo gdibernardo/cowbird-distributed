@@ -8,7 +8,7 @@ import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
 import kafka.connection.Config;
-import kafka.connection.LatencyController;
+
 import kafka.connection.consumer.Consumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -32,10 +32,6 @@ public class Producer {
 
         String identifier = sensorMessage.getExpressionId();
 
-        if(!LatencyController.sharedInstance().contains(identifier)) {
-            LatencyController.sharedInstance().set(identifier, System.currentTimeMillis());
-        }
-
         send(Topics.SENSORS_VALUES_TOPIC, identifier, sensorMessage.toJSON());
     }
 
@@ -58,8 +54,13 @@ public class Producer {
         handleConsumerEntryForControlMessages(expressionId);
 
         String topic = Topics.CONTROL_TOPIC_SVE;
-        if(controlMessage instanceof ConstantCompareControlMessage)
+
+        System.out.println("IT IS SENDING " + expressionId);
+
+        if(controlMessage instanceof ConstantCompareControlMessage) {
             topic = Topics.CONTROL_TOPIC_CVE;
+            System.out.println("SENDING CVE");
+        }
 
         send(topic, controlMessage.getExpressionId(), controlMessage.toJSON());
     }

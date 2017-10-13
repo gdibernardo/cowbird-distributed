@@ -23,8 +23,8 @@ public class TestSensor extends AbstractSwanSensor {
         float i=0;
 
         Random rand = new Random();
-        float minX = 0.0f;
-        float maxX = 10000.0f;
+        float minX = 25.0f;
+        float maxX = 210.0f;
 
 
         TestPoller(String id, String valuePath, HashMap configuration) {

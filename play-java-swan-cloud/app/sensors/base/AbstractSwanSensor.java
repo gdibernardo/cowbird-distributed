@@ -14,7 +14,7 @@ import java.util.Map;
 
 import cowbird.flink.common.messages.sensor.SensorMessage;
 import engine.EvaluationEngineService;
-import engine.RemoteEvaluationManager;
+import engine.remote.RemoteEvaluationManager;
 import interdroid.swancore.swansong.TimestampedValue;
 import kafka.connection.producer.Producer;
 
@@ -55,10 +55,11 @@ public abstract class AbstractSwanSensor implements SensorInterface {
         // System.out.println("putValueTrimSize: "+value+" "+valuePath + " sensor id " + id);
         if(RemoteEvaluationManager.sharedInstance().isPollingFromSensor(id)) {
 
-            SensorMessage message = new SensorMessage(RemoteEvaluationManager.sharedInstance().getTransmissionIdentifierForSensor(id),
+            SensorMessage message = new SensorMessage(id,
                     value,
                     now,
                     now);
+
             /*  Send the message asynchronously.    */
             Producer.sharedProducer().send(message);
         } else {

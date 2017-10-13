@@ -80,7 +80,7 @@ public class EvaluationEngineService /* implements Runnable */ {
 
 
     private final List<Worker> threadList = new ArrayList<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(4);
+    private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 
     private Thread mEvaluationThread = new Thread() {
@@ -121,7 +121,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                                                 - System.currentTimeMillis());
                                 // Log.d(TAG, "Waiting for " + waitTime +
                                 // " ms.");
-                                //System.out.println("Putting evaluation thread on wait for " + waitTime);
+                                // System.out.println("Putting evaluation thread on wait for " + waitTime);
                                 mEvaluationThread.wait(waitTime);
                                 // Log.d(TAG, "Done waiting for " + waitTime
                                 // + " ms.");
@@ -195,6 +195,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                 long evaluationTime = (end-start);
 
                 System.out.println("Evaluation time: " + evaluationTime + "ms");
+                System.out.flush();
                 // update with statistics: evaluationTime and evaluationDelay
                 head.evaluated((end - start), evaluationDelay);
 
@@ -247,7 +248,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                     }
 
 //                    System.out.println("Terminating thread: " + thread.getThreadName());
-                      // System.out.println("DONE: " + thread.getThreadName());
+                     System.out.println("DONE: " + thread.getThreadName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -333,6 +334,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                 // Log.d(TAG, "Got notification for: " + queued);
                 if (queued.getExpression() instanceof ValueExpression
                         || !queued.isDeferUntilGuaranteed()) {
+
                     // evaluate now!
                     synchronized (mEvaluationThread) {
                         // get it out the queue, update defer until, and put it

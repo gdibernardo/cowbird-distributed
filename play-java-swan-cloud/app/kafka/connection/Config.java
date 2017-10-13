@@ -18,12 +18,12 @@ public class Config {
     public static Properties defaultProducingProperties() {
         Properties properties = new Properties();
         // properties.put(ProducerConfig.ACKS_CONFIG, "all");
-        properties.put(ProducerConfig.LINGER_MS_CONFIG, 5);
+        properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
         // properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         // properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-gdiberna-0.sda.surf-hosted.nl:9092");
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
 
         return properties;
@@ -42,8 +42,8 @@ public class Config {
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupIdentifier);
 
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        // properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka-gdiberna-0.sda.surf-hosted.nl:9092");
+        properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 
         return properties;
     }

@@ -8,6 +8,7 @@ import cowbird.flink.common.messages.control.ConstantCompareControlMessage;
 import cowbird.flink.common.messages.control.ControlMessage;
 import cowbird.flink.common.messages.sensor.SensorMessage;
 
+import cowbird.flink.common.util.Utils;
 import org.apache.flink.api.java.utils.ParameterTool;
 
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
@@ -51,14 +52,14 @@ public class Job {
 
     private static final String JOB_NAME = "Cowbird-Flink";
 
-    private static final String KAFKA_BROKER_CONFIG = "kafka-gdiberna-0.sda.surf-hosted.nl:9092";
-
+    //private static final String KAFKA_BROKER_CONFIG = "kafka-gdiberna-0.sda.surf-hosted.nl:9092";
+    private static final String KAFKA_BROKER_CONFIG = "localhost:9092";
     /*  This can be (is) a path on HDFS. */
-    private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
+    // private static final String ROCKSDB_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_state";
 
     private static final String FS_STATE_PATH = "hdfs://hathi-surfsara/user/gdiberna/cowbird_fs_state";
 
-    // private static final String ROCKSDB_STATE_PATH = "file:///Users/gdibernardo/Documents/cowbird/cowbird_state";
+    private static final String ROCKSDB_STATE_PATH = "file:///Users/gdibernardo/Documents/cowbird/cowbird_state";
     private static final long CHECKPOINT_INTERVAL = 3600000; // ms
 
     public static final String CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID = "CONSUMER_FLINK_SENSORS_VALUES_GROUP_ID";
@@ -152,7 +153,7 @@ public class Job {
                         SensorMessage sensorMessage = new SensorMessage();
                         sensorMessage.initFromJSON(json);
 
-                        return new Tuple2<>(sensorMessage.getExpressionId(), sensorMessage);
+                        return new Tuple2<>(Utils.getParentForExpression(sensorMessage.getExpressionId()), sensorMessage);
                     }
                 });
 

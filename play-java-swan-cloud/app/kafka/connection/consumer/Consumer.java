@@ -1,6 +1,7 @@
 package kafka.connection.consumer;
 
 import cowbird.flink.common.messages.result.ResultMessage;
+// import engine.EvaluationEngineService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,8 @@ public class Consumer {
         String id = resultMessage.getExpressionId();
         if(resultHashMap.containsKey(id)) {
             resultHashMap.get(id).add(resultMessage);
+//            EvaluationEngineService instance = EvaluationEngineService.getInstance();
+//            instance.doNotify(new String[]{id});
         }
     }
 
