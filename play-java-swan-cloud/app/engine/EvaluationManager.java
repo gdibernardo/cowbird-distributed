@@ -725,10 +725,6 @@ public class EvaluationManager {
                 && rightDefer.guaranteed);
 
 
-        if(RemoteEvaluationManager.sharedInstance().isEvaluatingExpression(id)) {
-            comparatorResult.setDeferUntilGuaranteed(false);
-        }
-
         /*  Is this a bug?  */
 //        comparatorResult.setDeferUntil(Math.min(leftDefer.deferUntil,
 //                leftDefer.deferUntil));

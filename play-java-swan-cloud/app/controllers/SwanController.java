@@ -1006,7 +1006,7 @@ public class SwanController extends Controller {
     public Result testSound_local() {
         String id = "ME_test1-2345" + indexExpression++;
         // 3600000
-        String myExpression = "self@sound:value{MEDIAN, 5000} > 95.0";
+        String myExpression = "self@sound:value{MEAN, 20000} > 95.0";
 
         try {
             ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {

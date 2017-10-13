@@ -55,11 +55,8 @@ public class Producer {
 
         String topic = Topics.CONTROL_TOPIC_SVE;
 
-        System.out.println("IT IS SENDING " + expressionId);
-
         if(controlMessage instanceof ConstantCompareControlMessage) {
             topic = Topics.CONTROL_TOPIC_CVE;
-            System.out.println("SENDING CVE");
         }
 
         send(topic, controlMessage.getExpressionId(), controlMessage.toJSON());

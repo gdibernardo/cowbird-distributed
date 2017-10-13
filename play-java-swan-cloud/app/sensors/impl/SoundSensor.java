@@ -15,7 +15,7 @@ public class SoundSensor extends AbstractSwanSensor {
 
     class SoundPoller extends SensorPoller {
 
-        private long SENSOR_DELAY = 1000;
+        private long SENSOR_DELAY = 5000;
 
         float i = 0;
 
