@@ -56,7 +56,7 @@ The Flink application can be compiled using sbt:
 
 ` sbt assembly`
 
-On a local deployment start the Flink session using the **start-local.shs** script that can be found in the Flink directory.
+On a local deployment start the Flink session using the **start-local.sh** script that can be found in the Flink directory.
 Run the Flink job using the flink script:
 
 `./flink-1.3.2/bin/flink run ../path/to/distributed-cowbird/cowbird-flink/target/scala-2.11/cowbird-flink-assembly-1.0.jar`
