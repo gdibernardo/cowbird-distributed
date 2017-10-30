@@ -51,13 +51,18 @@ FrontendManager.sharedInstance().unregisterExpression(identifier);
 
 # Run the Streams Flink Job
 The Flink application can be compiled using sbt:
+
 ` sbt assembly`
 On a local deployment start the Flink session using the **start-local.shs** script that can be found in the Flink directory.
 Run the Flink job using the flink script:
+
 `./flink-1.3.2/bin/flink run ../path/to/distributed-cowbird/cowbird-flink/target/scala-2.11/cowbird-flink-assembly-1.0.jar`
+
 ## Streaming-oriented mode
 The streaming-oriented evalaution mode can be enabled using the --light-mode parameter when launching the Flink application.
-`./flink-1.3.2/bin/flink run ../path/to/distributed-cowbird/cowbird-flink/target/scala-2.11/cowbird-flink-assembly-1.0.jar` --light-mode ON
+
+`./flink-1.3.2/bin/flink run ../path/to/distributed-cowbird/cowbird-flink/target/scala-2.11/cowbird-flink-assembly-1.0.jar --light-mode ON`
+
 # Set the Kafka cluster
 In the /scripts directory some configuration scripts can be found.
  
