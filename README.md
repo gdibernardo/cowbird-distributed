@@ -8,7 +8,9 @@
 # Installation
 ## Compile the cowbird-flink-common library
 From the cowbird-flink-common directory run:
+
 `sbt assembly`
+
 `sbt publishLocal`
 
 # Setup the Fog layer
