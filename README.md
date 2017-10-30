@@ -7,7 +7,7 @@
 
 # Installation
 ## Compile the cowbird-flink-common library
-From the cowbird-flink-common directory run:
+From the /cowbird-flink-common directory run:
 
 `sbt assembly`
 
