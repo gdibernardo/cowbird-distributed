@@ -55,6 +55,7 @@ FrontendManager.sharedInstance().unregisterExpression(identifier);
 The Flink application can be compiled using sbt:
 
 ` sbt assembly`
+
 On a local deployment start the Flink session using the **start-local.shs** script that can be found in the Flink directory.
 Run the Flink job using the flink script:
 
