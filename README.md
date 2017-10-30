@@ -18,10 +18,10 @@ The Akka configuration parameters should be set in order to execute the Fog laye
 
 The seed-nodes list should contain the address (and port) of the Cowbird manager.
 
-## Run the Cowbird manager
+## Run the Cowbird Manager
 `sbt "runMain distributed.manager.CowbirdManagerApp 2551"`
 
-## Run the Cowbird node
+## Run the Cowbird Mode
 ` sbt "runMain distributed.node.CowbirdNodeApp $port"`
 
 ## Run the Play frontend 
