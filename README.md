@@ -66,7 +66,7 @@ The streaming-oriented evalaution mode can be enabled using the --light-mode par
 # Set the Kafka cluster
 In the /scripts directory some configuration scripts can be found.
  
-The deploy_cowbird_kafka_topics.sh can be used to install the Kafka topics required to execute the application.
+The **deploy_cowbird_kafka_topics.sh** can be used to install the Kafka topics required to execute the application.
 
 
 
