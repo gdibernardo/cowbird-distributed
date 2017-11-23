@@ -91,8 +91,6 @@ public class FogController extends Controller {
             //SendDataToWeb sendDataToWeb =new SendDataToWeb(acutatorLocation[0],id);
             SendDataToWebViaSocket sendDataToWeb =new SendDataToWebViaSocket(acutatorURL[0],Integer.parseInt(acutatorURL[1]),id);
             controlSWANExpression(command,subExpression[0], id, senderId, sendDataToWeb, actuatorSubExpression);
-
-
         }
 
 

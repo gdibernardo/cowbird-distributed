@@ -13,6 +13,9 @@ public class CowbirdConfiguration {
 
     private final static int DEFAULT_SYSTEM_LOAD = 8;
 
+    public final static int DEFAULT_FOG_PORT = 10000;
+    private int fogPort = DEFAULT_FOG_PORT;
+
 
     private AtomicInteger currentLoad;
 
@@ -22,6 +25,7 @@ public class CowbirdConfiguration {
 
     private static CowbirdConfiguration instance = new CowbirdConfiguration(DEFAULT_SYSTEM_LOAD);
 
+    private CowbirdNodeType nodeType;
 
     public static int defaultSystemLoad() {
         return DEFAULT_SYSTEM_LOAD;
@@ -33,11 +37,16 @@ public class CowbirdConfiguration {
     }
 
 
+    public int getFogPort() {
+        return fogPort++;
+    }
+
     public CowbirdConfiguration(int systemLoad) {
         this.systemLoad = systemLoad;
         this.currentLoad = new AtomicInteger(0);
-    }
 
+        nodeType = CowbirdNodeType.FOG_NODE;
+    }
 
     public void setCowbirdInstance(ActorRef cowbirdInstance) {
         this.cowbirdInstance = cowbirdInstance;
@@ -50,7 +59,7 @@ public class CowbirdConfiguration {
 
 
     public CowbirdState state() {
-        return new CowbirdState(systemLoad, currentLoad.get(), cowbirdInstance);
+        return new CowbirdState(systemLoad, currentLoad.get(), cowbirdInstance, nodeType);
     }
 
 
@@ -64,11 +73,24 @@ public class CowbirdConfiguration {
     }
 
 
+    public int getSystemLoad() {
+        return systemLoad;
+    }
+
     public int hashCode() {
         if(cowbirdInstance != null) {
             return cowbirdInstance.hashCode();
         }
 
         return 0;
+    }
+
+
+    public void setNodeType(CowbirdNodeType nodeType) {
+        this.nodeType = nodeType;
+    }
+
+    public CowbirdNodeType getNodeType() {
+        return nodeType;
     }
 }

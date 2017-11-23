@@ -6,6 +6,7 @@ package engine.remote;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class RemoteEvaluationLatencyMonitor {
 
     private static RemoteEvaluationLatencyMonitor instance = new RemoteEvaluationLatencyMonitor();
@@ -15,6 +16,7 @@ public class RemoteEvaluationLatencyMonitor {
     }
 
     private Map<String, Long> producingTimestampsMap = new HashMap<>();
+
 
     public long getLatency(String expressionId) {
 
@@ -32,4 +34,5 @@ public class RemoteEvaluationLatencyMonitor {
     public void register(String expressionId) {
         producingTimestampsMap.put(expressionId, System.currentTimeMillis());
     }
+
 }

@@ -1,14 +1,13 @@
 package sensors.impl;
 
+import distributed.node.CowbirdConfiguration;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import sensors.base.AbstractSwanSensor;
 import sensors.base.SensorPoller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -22,7 +21,6 @@ public class FogtestSensor extends AbstractSwanSensor {
 
     private Map<String, FogtestSensor.FogTestPoller> activeThreads = new HashMap<String, FogtestSensor.FogTestPoller>();
 
-
     public static final String VALUE = "value";
 
 
@@ -31,14 +29,18 @@ public class FogtestSensor extends AbstractSwanSensor {
         int i=0;
         ServerSocket server;
         Socket socket;
-        ObjectInputStream ois;
+        // ObjectInputStream ois;
+
+        BufferedReader inputBuffer;
+        DataOutputStream outputStream;
 
         FogTestPoller(String id, String valuePath, HashMap configuration) {
             super(id, valuePath, configuration);
             try {
-                server = new ServerSocket(7782);
-                socket = server.accept();
-                ois = new ObjectInputStream(socket.getInputStream());
+
+                int port = CowbirdConfiguration.nodeConfiguration().getFogPort();
+                server = new ServerSocket(port);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -46,17 +48,40 @@ public class FogtestSensor extends AbstractSwanSensor {
 
 
         public void run() {
-            while (!isInterrupted()) {
 
+            try {
+                socket = server.accept();
+                // ois = new ObjectInputStream(socket.getInputStream());
+                inputBuffer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                outputStream = new DataOutputStream(socket.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            while (!isInterrupted()) {
                 try {
 
-                    String message = (String) ois.readObject();
+                    String message = (String) inputBuffer.readLine();
 
                     try {
                         JSONObject json = new JSONObject(message);
 
-                        updateResult(FogtestSensor.this,json.get("data"),json.getLong("time"));
+                        long now = System.currentTimeMillis();
 
+                        int id = json.getInt("id");
+                        // updateResult(FogtestSensor.this,json.get("data"), json.getLong("timestamp"));
+                        updateResult(FogtestSensor.this,json.get("data"), now);
+
+                        if(json.getInt("ack") == 1) {
+                            JSONObject jsonObject = new JSONObject();
+                            json.put("timestamp", now);
+                            json.put("id", id);
+
+                            String jsonMessage = json.toString();
+
+                            outputStream.writeBytes(jsonMessage);
+                            outputStream.writeBytes("\n");
+                        }
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -64,9 +89,10 @@ public class FogtestSensor extends AbstractSwanSensor {
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                }  catch (ClassNotFoundException e) {
-                    e.printStackTrace();
                 }
+//              catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                }
 
             }
 
@@ -104,7 +130,12 @@ public class FogtestSensor extends AbstractSwanSensor {
 
     @Override
     public String[] getValuePaths()  {
-        return new String[]{ VALUE};
+
+        //return new String[]{ VALUE};
+        String [] values = new String[1000000];
+        for(int index = 0; index < 1000000; index++) {
+            values[index] = "value"+index;
+        }
     }
 
     @Override

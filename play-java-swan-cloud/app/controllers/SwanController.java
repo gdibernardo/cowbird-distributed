@@ -3,13 +3,13 @@ package controllers;
 import actuator.SendEmail;
 import actuator.SendFacebookMessage;
 import actuator.SendPhoneResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import distributed.frontend.location.Coordinate;
+import distributed.frontend.location.LocationService;
+import distributed.frontend.resource.CowbirdResourceState;
 import distributed.frontend.FrontendManager;
 import engine.*;
 import interdroid.swancore.swansong.*;
@@ -25,7 +25,6 @@ import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
 import play.mvc.Controller;
 import play.mvc.Result;
-import interdroid.swancore.swansong.*;
 import sensors.base.SensorFactory;
 import sensors.base.SensorInterface;
 import views.html.index;
@@ -33,7 +32,6 @@ import views.html.index;
 
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -61,8 +59,6 @@ public class SwanController extends Controller {
     public Result index() {
         return ok(index.render("Your new application is ready."));
     }
-
-
 
 
     public Result sendDataToPhone(){
@@ -336,6 +332,7 @@ public class SwanController extends Controller {
                                 try {
                                     jsonObject.put("id", id);
                                     jsonObject.put("A", "V");
+
                                     //jsonObject.put("data",newValues[0]);
 
                                     //interdroid.swancore.swansong.Result result = new interdroid.swancore.swansong.Result(newValues, newValues[0].getTimestamp());
@@ -1027,6 +1024,101 @@ public class SwanController extends Controller {
 
 
 
+    int fogTestId = 0;
+
+    public Result registerFogExpression() {
+        System.out.println("Fog expression registered!");
+
+        String id = "ME_test1-2345" + indexExpression++;
+        // 3600000
+        String myExpression = "self@fogtest:value"+(fogTestId++)+"{MEAN, 20000} > 95.0";
+
+        try {
+            FrontendManager.sharedInstance().registerTriStateExpression((TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {
+                @Override
+                public void onNewState(String id, long timestamp, TriState newState) {
+                    System.out.println("Fog local id: " + id + " " + newState);
+                }
+            });
+        } catch (ExpressionParseException e) {
+            e.printStackTrace();
+        }
+
+//        try {
+//            ExpressionManager.registerTriStateExpression(id, (TriStateExpression) ExpressionFactory.parse(myExpression), new TriStateExpressionListener() {
+//                @Override
+//                public void onNewState(String id, long timestamp, TriState newState) {
+//
+//
+//                }
+//            });
+//        } catch (SwanException e) {
+//            e.printStackTrace();
+//        }
+
+        return ok("Registered");
+    }
+
+
+    public Result registerSensor() {
+
+
+        Coordinate coordinates = LocationService.sharedInstance().getCoordinatesFromIP(request().remoteAddress());
+
+        CowbirdResourceState resourceState = FrontendManager.sharedInstance().getCowbirdResource(coordinates);
+
+        if(resourceState != null) {
+            String ip = resourceState.getState().getCowbirdRef().path().address().host().get();
+            int port = 10000 + resourceState.getResourceUtilization() - 1;
+
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("ip", ip);
+                jsonObject.put("port", port);
+                jsonObject.put("timestamp", System.currentTimeMillis());
+
+
+                System.out.println("registered sensor " + jsonObject.toString());
+                return ok(jsonObject.toString());
+            } catch (JSONException exception) {
+                System.out.println(exception.getLocalizedMessage());
+            }
+        }
+
+        return ok("No more available sensor");
+    }
+
+    int registeredExpressions = 0;
+
+    public Result registerExpression() {
+
+
+        String jsonContent = request().body().asText();
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonContent);
+            String expressionIdentifier = "Expressions_" + registeredExpressions++;
+
+            System.out.println("Text " + jsonObject.getString("id"));
+
+            return ok(expressionIdentifier);
+
+        } catch (JSONException exception) {
+            System.out.println("Error creating JSONObject " + exception.getLocalizedMessage());
+        }
+
+      return badRequest();
+
+    }
+
+
+
+    public Result updateSensorData() {
+
+
+        return ok();
+    }
+
 
     public Result testRegisterTestTriStateSwan(){
 
@@ -1316,7 +1408,6 @@ public class SwanController extends Controller {
 
 
     public Result registerExpressionForEmailNotification(){
-
 
         JsonNode json = request().body().asJson();
 

@@ -82,6 +82,7 @@ public class CowbirdNode extends NodeActor {
                     register();
                 })
                 .match(WorkMessage.class, work -> {
+                    log.info("Received work");
                     doWork(work.getWork());
                     register();
                 })

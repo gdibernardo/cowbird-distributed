@@ -1,13 +1,11 @@
 package engine;
 
+import distributed.node.CowbirdConfiguration;
 import interdroid.swancore.swansong.Expression;
 import interdroid.swancore.swansong.Result;
 import interdroid.swancore.swansong.ValueExpression;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.concurrent.*;
 
 import static java.lang.Thread.interrupted;
@@ -80,7 +78,7 @@ public class EvaluationEngineService /* implements Runnable */ {
 
 
     private final List<Worker> threadList = new ArrayList<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(1);
+    private ExecutorService executor = Executors.newFixedThreadPool(CowbirdConfiguration.nodeConfiguration().getSystemLoad());
 
 
     private Thread mEvaluationThread = new Thread() {
@@ -186,8 +184,12 @@ public class EvaluationEngineService /* implements Runnable */ {
                     evaluationDelay = 0;
                 }
 
+
+
+                long waitingLatency = System.currentTimeMillis() - LatencyMonitor.sharedInstance().getNotificationTime(head.getId());
+                System.out.println("Waiting time: " + waitingLatency);
                 long start = System.currentTimeMillis();
-                // System.out.println("Calling evaluate from engine service for " + head.getId());
+                // System.out.println("Calling evaluate from engine service for " + head.getId())
                 result = mEvaluationManager.evaluate(
                         head.getId(), head.getExpression(),
                         System.currentTimeMillis());
@@ -267,6 +269,7 @@ public class EvaluationEngineService /* implements Runnable */ {
             return;
         }
         try {
+            LatencyMonitor.sharedInstance().registerForNotificationTime(id);
             mEvaluationManager.initialize(id, expression);
         } catch (SensorConfigurationException e) {
             // FAIL!
@@ -277,6 +280,7 @@ public class EvaluationEngineService /* implements Runnable */ {
             e.printStackTrace();
             return;
         }
+
         synchronized (mEvaluationThread) {
             // add this expression to our registered expression, the queue and
             // notify the evaluation thread
@@ -299,6 +303,8 @@ public class EvaluationEngineService /* implements Runnable */ {
            // Log.d(TAG, "Got spurious unregister for id: " + id);
             return;
         }
+
+        SensedDataBroker.sharedInstance().removeSensor(id);
        // Log.d(TAG, "unregistering id: " + id + ", expression: " + expression);
         // first stop evaluating
         synchronized (mEvaluationThread) {
@@ -345,6 +351,7 @@ public class EvaluationEngineService /* implements Runnable */ {
                         // from a remote device, not for the queued, which prevents the evaluation engine
                         // to handle the new result properly in the evaluation thread
 //					mEvaluationManager.clearCacheFor(id);
+
 
                         // added this as patch; might not work for all cases, as clearCacheFor() does some
                         // extra stuff in addition to setting deferUntil to 0

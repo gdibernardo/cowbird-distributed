@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="SBT: nl.cowbird:cowbird-flink-common_2.11:1.0:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/local/nl.cowbird/cowbird-flink-common_2.11/1.0/jars/cowbird-flink-common_2.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/local/nl.cowbird/cowbird-flink-common_2.11/1.0/srcs/cowbird-flink-common_2.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

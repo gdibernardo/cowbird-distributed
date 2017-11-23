@@ -44,7 +44,7 @@ public abstract class NodeActor extends AbstractActor {
 
 
     public void cancelConnectingTask() {
-        this.pingTask.cancel();
+        pingTask.cancel();
     }
 
 

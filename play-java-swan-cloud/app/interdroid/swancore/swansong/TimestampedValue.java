@@ -140,6 +140,8 @@ public class TimestampedValue implements Serializable, //Parcelable,
 	/* n*n complexity */
 	public static TimestampedValue calculateMean(
 			final List<TimestampedValue> values) {
+		long now = System.currentTimeMillis();
+
 		double sumValues = 0.0;
 		for (TimestampedValue value1 : values) {
 			for (TimestampedValue value2 : values) {

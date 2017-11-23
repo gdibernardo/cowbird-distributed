@@ -17,6 +17,15 @@ public class CowbirdNodeApp {
     }
 
 
+    private static CowbirdNodeType getNodeType(String nodeArgument) {
+        if(nodeArgument.toLowerCase().equals("cloud")) {
+            return CowbirdNodeType.CLOUD_NODE;
+        }
+
+        return CowbirdNodeType.FOG_NODE;
+    }
+
+
     public static void startUp(String[] args) {
         final String port = args.length > 0 ? args[0] : "0";
 
@@ -25,8 +34,17 @@ public class CowbirdNodeApp {
                 withFallback(ConfigFactory.load());
 
         ActorSystem system = ActorSystem.create("CowbirdClusterSystem", config);
-        
-        CowbirdConfiguration.nodeConfiguration().setSystemLoad(CowbirdConfiguration.defaultSystemLoad());
+
+        if(args.length > 1) {
+            CowbirdConfiguration.nodeConfiguration().setNodeType(getNodeType(args[1]));
+        }
+
+        if(args.length > 2) {
+            CowbirdConfiguration.nodeConfiguration().setSystemLoad(Integer.parseInt(args[2]));
+        } else {
+            CowbirdConfiguration.nodeConfiguration().setSystemLoad(CowbirdConfiguration.defaultSystemLoad());
+        }
+
         system.actorOf(CowbirdNode.props(), Roles.COWBIRD_NODE);
     }
 }

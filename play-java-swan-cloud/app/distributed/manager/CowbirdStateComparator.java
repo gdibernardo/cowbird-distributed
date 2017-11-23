@@ -18,10 +18,12 @@ public class CowbirdStateComparator implements Comparator<CowbirdState> {
         if(secondState == null)
             return -1;
 
-        if(firstState.getCurrentLoad() < secondState.getCurrentLoad())
-            return -1;
-        if(firstState.getCurrentLoad() > secondState.getCurrentLoad())
+        int firstDelta = firstState.getSystemLoad() - firstState.getCurrentLoad();
+        int secondDelta = secondState.getSystemLoad() - secondState.getCurrentLoad();
+        if(firstDelta < secondDelta)
             return 1;
+        if(firstDelta > secondDelta)
+            return -1;
 
         return 0;
     }

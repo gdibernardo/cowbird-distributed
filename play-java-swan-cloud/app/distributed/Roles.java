@@ -10,6 +10,8 @@ public final class Roles {
 
     public static final String COWBIRD_FRONTEND = "cowbird-frontend";
 
+    public static final String COWBIRD_FRONTEND_RESOURCE_MANAGER = COWBIRD_FRONTEND + "-manager";
+
     public static final String COWBIRD_NODE = "cowbird-node";
 
     private Roles() {

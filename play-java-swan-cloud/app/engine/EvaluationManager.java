@@ -283,6 +283,8 @@ public class EvaluationManager {
                 return result;
             }
 
+
+
             TimestampedValue[] reduced = TimestampedValue.applyMode(values,
                     expression.getHistoryReductionMode());
 

@@ -100,6 +100,6 @@ public class TestSensor extends AbstractSwanSensor {
 
     @Override
     public boolean isHighFrequency() {
-        return true;
+        return false;
     }
 }

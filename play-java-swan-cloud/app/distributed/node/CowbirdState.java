@@ -16,6 +16,14 @@ public class CowbirdState implements Serializable {
 
     private ActorRef cowbirdRef;
 
+    private CowbirdNodeType nodeType;
+
+
+    public CowbirdState(int systemLoad, int currentLoad, ActorRef cowbirdRef, CowbirdNodeType nodeType) {
+        this(systemLoad, currentLoad, cowbirdRef);
+
+        this.nodeType = nodeType;
+    }
 
     public CowbirdState(int systemLoad, int currentLoad, ActorRef cowbirdRef) {
         this(systemLoad, currentLoad);
@@ -44,6 +52,10 @@ public class CowbirdState implements Serializable {
         return cowbirdRef;
     }
 
+
+    public CowbirdNodeType getNodeType() {
+        return nodeType;
+    }
 
     protected void setCowbirdRef(ActorRef cowbirdRef) {
         this.cowbirdRef = cowbirdRef;

@@ -22,10 +22,12 @@ import distributed.messages.ping.AckPingMessage;
 import distributed.messages.ping.PingMessage;
 import distributed.messages.result.ResultMessage;
 
+import distributed.node.CowbirdNodeType;
 import distributed.node.CowbirdState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -45,11 +47,15 @@ public class CowbirdManager extends AbstractActor {
     /*  This hashmap keeps track of which frontend actor is responsible of a certain expression.    */
     private HashMap<String, ActorRef> frontendActorMap = new HashMap();
     /*  Cowbirds heap.  */
-    private PriorityQueue<CowbirdState> cowbirds = new PriorityQueue<>(COWBIRDS_INITIAL_CAPACITY, new CowbirdStateComparator());
+    private PriorityQueue<CowbirdState> fogCowbirds = new PriorityQueue<>(COWBIRDS_INITIAL_CAPACITY, new CowbirdStateComparator());
+    private PriorityQueue<CowbirdState> cloudCowbirds = new PriorityQueue<>(COWBIRDS_INITIAL_CAPACITY, new CowbirdStateComparator());
 
     private ActorRef mediator;
-    /*  This hashmap maps a Cowbirdn node instance to its host. */
+    /*  This hashmap maps a Cowbird node instance to its host. */
     private HashMap<String, CowbirdState> hostCowbirdMap = new HashMap<>();
+
+    /*  Frontend(s) list.   */
+    private List<ActorRef> frontendsList = new ArrayList<>();
 
     private Cluster cluster = Cluster.get(getContext().system());
 
@@ -69,7 +75,6 @@ public class CowbirdManager extends AbstractActor {
         cluster.unsubscribe(self());
     }
 
-
     @Override
     public Receive createReceive() {
         return receiveBuilder()
@@ -88,11 +93,25 @@ public class CowbirdManager extends AbstractActor {
                 })
                 .match(CowbirdRegistrationMessage.class, cowbirdRegistrationMessage -> {
                     log.info("cowbird-manager received a registration message. From: {}", cowbirdRegistrationMessage.getCowbirdState().getCowbirdRef().path().address().hostPort());
-                    hostCowbirdMap.put(cowbirdRegistrationMessage.getCowbirdState().getCowbirdRef().path().address().hostPort(), cowbirdRegistrationMessage.getCowbirdState());
-                    cowbirds.add(cowbirdRegistrationMessage.getCowbirdState());
+
+                    for(int index = 0; index < frontendsList.size(); index++) {
+                        frontendsList.get(index).tell(cowbirdRegistrationMessage, self());
+                    }
+
+                    CowbirdState state = cowbirdRegistrationMessage.getCowbirdState();
+
+                    hostCowbirdMap.put(state.getCowbirdRef().path().address().hostPort(), state);
+                    if(state.getNodeType() == CowbirdNodeType.FOG_NODE) {
+                        fogCowbirds.add(state);
+                    } else {
+                        cloudCowbirds.add(state);
+                    }
                     if(WorkStateManager.sharedInstance().hasWork()) {
                         notifyCowbirds();
                     }
+                })
+                .match(FrontendRegistrationMessage.class, frontendRegistrationMessage -> {
+                    frontendsList.add(sender());
                 })
                 .match(ResultMessage.class, message -> {
                     handleResultMessage(message);
@@ -133,7 +152,12 @@ public class CowbirdManager extends AbstractActor {
 
     private void handleCowbirdDisconnection(CowbirdState state) {
         WorkStateManager.sharedInstance().reassignWorkFromCowbird(state.getCowbirdRef());
-        cowbirds.remove(state);
+        if(state.getNodeType() == CowbirdNodeType.FOG_NODE) {
+            fogCowbirds.remove(state);
+        } else {
+            cloudCowbirds.remove(state);
+        }
+
         if(WorkStateManager.sharedInstance().hasWork()) {
             notifyCowbirds();
         }
@@ -163,19 +187,49 @@ public class CowbirdManager extends AbstractActor {
     }
 
 
-    private void notifyCowbirds() {
-        if(cowbirds.size() > 0) {
-            ActorRef cowbird = cowbirds.poll().getCowbirdRef();
-
+    private void registerCowbird(ActorRef cowbird) {
             Work work = WorkStateManager.sharedInstance().registerCowbirdForWork(cowbird);
 
             WorkMessage message = new WorkMessage(work);
 
             cowbird.tell(message, getSelf());
-        } else {
-            log.info("CowbirdManager:notifyCowbirds()   -   No cowbirds available for work at the moment.");
-        }
     }
+
+
+    private void notifyCowbirds() {
+
+        log.info("Cowbirds notified");
+        if (fogCowbirds.size() > 0) {
+            CowbirdState head = fogCowbirds.peek();
+
+            /*  Fog workload threshold. */
+            if ((head.getCurrentLoad() < head.getSystemLoad() * 2) || (cloudCowbirds.size() == 0)) {
+                registerCowbird(fogCowbirds.poll().getCowbirdRef());
+                return;
+            }
+        }
+
+        if (cloudCowbirds.size() > 0) {
+            registerCowbird(cloudCowbirds.poll().getCowbirdRef());
+            return;
+        }
+
+        log.info("CowbirdManager:notifyCowbirds()   -   No cowbirds available for work at the moment.");
+    }
+
+
+//        if(cowbirds.size() > 0) {
+//            ActorRef cowbird = cowbirds.poll().getCowbirdRef();
+//
+//            Work work = WorkStateManager.sharedInstance().registerCowbirdForWork(cowbird);
+//
+//            WorkMessage message = new WorkMessage(work);
+//
+//            cowbird.tell(message, getSelf());
+//        } else {
+//            log.info("CowbirdManager:notifyCowbirds()   -   No cowbirds available for work at the moment.");
+//        }
+//     }
 
 
     public void registerFrontend(String expressionIdentifier, ActorRef frontend) {
