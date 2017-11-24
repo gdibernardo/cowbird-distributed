@@ -136,6 +136,8 @@ public class FogtestSensor extends AbstractSwanSensor {
         for(int index = 0; index < 1000000; index++) {
             values[index] = "value"+index;
         }
+
+        return values;
     }
 
     @Override

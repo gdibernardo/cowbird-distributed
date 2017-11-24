@@ -1,6 +1,0 @@
-2017-11-23 17:19:16,805 [INFO] from play.api.Play in ForkJoinPool-1-worker-1 - Application started (Dev)
-2017-11-23 17:28:05,029 [WARN] from akka.remote.PhiAccrualFailureDetector in CowbirdClusterSystem-akka.actor.default-dispatcher-17 - heartbeat interval is growing too large: 2749 millis
-2017-11-23 17:28:05,033 [WARN] from akka.remote.PhiAccrualFailureDetector in CowbirdClusterSystem-akka.actor.default-dispatcher-17 - heartbeat interval is growing too large: 2752 millis
-2017-11-23 17:28:05,034 [WARN] from akka.remote.PhiAccrualFailureDetector in CowbirdClusterSystem-akka.actor.default-dispatcher-17 - heartbeat interval is growing too large: 2758 millis
-2017-11-23 17:46:41,680 [WARN] from akka.cluster.Cluster(akka://CowbirdClusterSystem) in CowbirdClusterSystem-akka.actor.default-dispatcher-18 - Could not unregister Cluster JMX MBean with name=akka:type=Cluster as it was not found. If you are running multiple clusters in the same JVM, set 'akka.cluster.jmx.multi-mbeans-in-same-jvm = on' in config
-2017-11-23 17:46:41,732 [WARN] from akka.remote.transport.netty.NettyTransport in CowbirdClusterSystem-akka.actor.default-dispatcher-17 - Remote connection to [/127.0.0.1:60230] failed with java.io.IOException: Broken pipe

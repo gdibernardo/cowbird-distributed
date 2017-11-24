@@ -19,31 +19,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FogtestSensor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/sensors/impl/FogtestSensor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="82" column="58" lean-forward="false" selection-start-line="82" selection-start-column="58" selection-end-line="82" selection-end-column="58" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RemoteEvaluationLatencyMonitor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/engine/remote/RemoteEvaluationLatencyMonitor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="13" lean-forward="false" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EvaluationEngineService.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="EvaluationEngineService.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/engine/EvaluationEngineService.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1529">
@@ -73,10 +49,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LatencyMonitor.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LatencyMonitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/engine/LatencyMonitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-26">
+            <state relative-caret-position="222">
               <caret line="20" column="52" lean-forward="true" selection-start-line="20" selection-start-column="44" selection-end-line="20" selection-end-column="52" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -193,8 +169,8 @@
         <option value="$PROJECT_DIR$/app/distributed/node/CowbirdConfiguration.java" />
         <option value="$PROJECT_DIR$/app/controllers/SwanController.java" />
         <option value="$PROJECT_DIR$/app/sensors/base/AbstractSwanSensor.java" />
-        <option value="$PROJECT_DIR$/app/sensors/impl/FogtestSensor.java" />
         <option value="$PROJECT_DIR$/app/engine/EvaluationEngineService.java" />
+        <option value="$PROJECT_DIR$/app/sensors/impl/FogtestSensor.java" />
       </list>
     </option>
   </component>
@@ -580,12 +556,12 @@
       <workItem from="1511255111913" duration="9753000" />
       <workItem from="1511272168711" duration="643000" />
       <workItem from="1511366218392" duration="3561000" />
-      <workItem from="1511441087903" duration="9054000" />
+      <workItem from="1511441087903" duration="9363000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69196000" />
+    <option name="totallyTimeSpent" value="69505000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -958,16 +934,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/engine/remote/RemoteEvaluationLatencyMonitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="13" lean-forward="false" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/distributed/node/CowbirdNode.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-6">
@@ -995,16 +961,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/sensors/impl/FogtestSensor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="82" column="58" lean-forward="false" selection-start-line="82" selection-start-column="58" selection-end-line="82" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/sensors/base/AbstractSwanSensor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="515">
@@ -1013,21 +969,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/engine/LatencyMonitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="20" column="52" lean-forward="true" selection-start-line="20" selection-start-column="44" selection-end-line="20" selection-end-column="52" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/sensors/impl/FogtestSensor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="139" column="22" lean-forward="false" selection-start-line="139" selection-start-column="22" selection-end-line="139" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/engine/remote/RemoteEvaluationLatencyMonitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="13" lean-forward="false" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/engine/EvaluationEngineService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1529">
           <caret line="271" column="11" lean-forward="false" selection-start-line="271" selection-start-column="11" selection-end-line="271" selection-end-column="11" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/engine/LatencyMonitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-26">
-          <caret line="20" column="52" lean-forward="true" selection-start-line="20" selection-start-column="44" selection-end-line="20" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
