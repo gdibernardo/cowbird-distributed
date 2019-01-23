@@ -21,7 +21,7 @@ The seed-nodes list should contain the address (and port) of the Cowbird manager
 ## Run the Cowbird Manager
 `sbt "runMain distributed.manager.CowbirdManagerApp 2551"`
 
-## Run the Cowbird Mode
+## Run the Cowbird Node
 ` sbt "runMain distributed.node.CowbirdNodeApp $port"`
 
 ## Run the Play frontend 
